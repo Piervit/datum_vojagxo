@@ -482,6 +482,7 @@ class Urbo(Base):
     id = Column(Integer, primary_key=True)
     nomoLoka = Column(String(255, 'utf8_unicode_ci'))
     nomoEo = Column(String(255, 'utf8_unicode_ci'))
+    provinco= Column(String(255, 'utf8_unicode_ci'))
     idLando = Column(Integer)
 
 
