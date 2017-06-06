@@ -1,0 +1,383 @@
+# coding: utf-8
+from sqlalchemy import Column, Date, Integer, MetaData, String, Table, Text, text
+
+
+metadata = MetaData()
+
+
+t_asaldono = Table(
+    'asaldono', metadata,
+    Column('ueakodo', String(4)),
+    Column('fondita', Text),
+    Column('aligho', Text),
+    Column('prez', Text),
+    Column('estrtit', Text),
+    Column('memkvanto', Integer),
+    Column('grupkvanto', Integer),
+    Column('organo', Text),
+    Column('orgadr', Text),
+    Column('orgret', Text),
+    Column('retejo', Text),
+    Column('ls', Text),
+    Column('lsretadr', Text),
+    Column('lsretejo', Text),
+    Column('dissendolisto', Text),
+    Column('dato', Date),
+    Column('kiu', Text)
+)
+
+
+t_asocioj = Table(
+    'asocioj', metadata,
+    Column('ueakodo', String),
+    Column('personanomo', String),
+    Column('familianomo', String),
+    Column('adreso', String),
+    Column('urbo', String),
+    Column('posxtkodo', String),
+    Column('_28', String),
+    Column('_29', String),
+    Column('telhejmo', String),
+    Column('landokodo', String),
+    Column('retposxto', String),
+    Column('jarkat', Text),
+    Column('konstkat', String),
+    Column('deleg_fako', String),
+    Column('tttpagxo', String),
+    Column('abc', String)
+)
+
+
+t_datoj1 = Table(
+    'datoj1', metadata,
+    Column('ueakodo', String(4)),
+    Column('landokodo', String(3)),
+    Column('m00', Date),
+    Column('m01', Date),
+    Column('m02', Date),
+    Column('m03', Date),
+    Column('m04', Date),
+    Column('m05', Date),
+    Column('m06', Date),
+    Column('m07', Date),
+    Column('m08', Date),
+    Column('m09', Date),
+    Column('dm', Date),
+    Column('sz', Date),
+    Column('hm', Date),
+    Column('nev', Date),
+    Column('hpk', Date),
+    Column('uk06', Date),
+    Column('uk07', Date),
+    Column('uk08', Date),
+    Column('uk09', Date),
+    Column('sz06', Date),
+    Column('sz07', Date),
+    Column('sz08', Date),
+    Column('sz09', Date),
+    Column('m10', Date),
+    Column('sz10', Date),
+    Column('uk10', Date),
+    Column('m11', Date),
+    Column('sz11', Date),
+    Column('uk11', Date),
+    Column('m12', Date),
+    Column('sz12', Date),
+    Column('uk12', Date),
+    Column('m13', Date),
+    Column('sz13', Date),
+    Column('uk13', Date),
+    Column('m14', Date),
+    Column('sz14', Date),
+    Column('uk14', Date),
+    Column('m15', Date),
+    Column('sz15', Date),
+    Column('uk15', Date),
+    Column('kto11', Date),
+    Column('sa11', Date),
+    Column('kto12', Date),
+    Column('sa12', Date),
+    Column('kto13', Date),
+    Column('sa13', Date),
+    Column('kto14', Date),
+    Column('sa14', Date),
+    Column('kto15', Date),
+    Column('sa15', Date),
+    Column('m16', Date),
+    Column('sz16', Date),
+    Column('uk16', Date),
+    Column('kto16', Date),
+    Column('sa16', Date),
+    Column('m17', Date),
+    Column('sz17', Date),
+    Column('uk17', Date),
+    Column('kto17', Date),
+    Column('sa17', Date),
+    Column('m18', Date),
+    Column('sz18', Date),
+    Column('uk18', Date),
+    Column('kto18', Date),
+    Column('sa18', Date),
+    Column('m19', Date),
+    Column('sz19', Date),
+    Column('uk19', Date),
+    Column('kto19', Date),
+    Column('sa19', Date),
+    Column('m20', Date),
+    Column('m21', Date),
+    Column('m22', Date),
+    Column('m23', Date),
+    Column('m24', Date)
+)
+
+
+t_delegar = Table(
+    'delegar', metadata,
+    Column('id', Integer),
+    Column('adreso', String(150)),
+    Column('deleg_fako', Text),
+    Column('deleg_loko', Text),
+    Column('familianomo', Text),
+    Column('konstkat', Text),
+    Column('landokodo', String(4)),
+    Column('personanomo', Text),
+    Column('posxtkodo', String(50)),
+    Column('profesio', Text),
+    Column('retposxto', Text),
+    Column('telhejmo', Text),
+    Column('_28', Text),
+    Column('tttpagxo', String(70)),
+    Column('_29', Text),
+    Column('ueakodo', String(5)),
+    Column('urbo', Text),
+    Column('fakso', String(100)),
+    Column('portebla', String(100)),
+    Column('deleg', String(1)),
+    Column('fd', String(1)),
+    Column('jd', String(1)),
+    Column('abc', Text)
+)
+
+
+t_kluboj = Table(
+    'kluboj', metadata,
+    Column('id', Integer),
+    Column('avi', String),
+    Column('_0', String),
+    Column('_18', String),
+    Column('_28', String),
+    Column('_29', String),
+    Column('_30', String),
+    Column('_6', String),
+    Column('adreso', String),
+    Column('deleg_fako', String),
+    Column('deleg_loko', String),
+    Column('familianomo', String),
+    Column('konstkat', String),
+    Column('landokodo', String),
+    Column('naskigxtago', String),
+    Column('notoj', String),
+    Column('personanomo', String),
+    Column('posxtkodo', String),
+    Column('profesio', String),
+    Column('retposxto', String),
+    Column('telhejmo', String),
+    Column('teloficejo', String),
+    Column('tttpagxo', String),
+    Column('ueakodo', String),
+    Column('urbo', String),
+    Column('jarkat', Text),
+    Column('fakso', String),
+    Column('portebla', String),
+    Column('abc', String)
+)
+
+
+t_komit = Table(
+    'komit', metadata,
+    Column('ueakodo', String),
+    Column('personanomo', String),
+    Column('familianomo', String),
+    Column('landokodo', String),
+    Column('konstkat', String),
+    Column('asoc', String(20))
+)
+
+
+t_landkodoj = Table(
+    'landkodoj', metadata,
+    Column('id', Integer, nullable=False, server_default=text("nextval('landkodoj_id_seq'::regclass)")),
+    Column('_16', String),
+    Column('_20', String),
+    Column('_21', String),
+    Column('_25', String),
+    Column('landaasocio', String),
+    Column('landduliter', String),
+    Column('landofinajxo', String),
+    Column('landokodo', String),
+    Column('landoradiko', String),
+    Column('landotraduko', String),
+    Column('telfonkodo', String)
+)
+
+
+t_perant = Table(
+    'perant', metadata,
+    Column('id', Integer),
+    Column('personanomo', String),
+    Column('familianomo', String),
+    Column('adreso', String),
+    Column('urbo', String),
+    Column('posxtkodo', String),
+    Column('_28', String),
+    Column('telhejmo', String),
+    Column('landokodo', String),
+    Column('retposxto', String),
+    Column('konstkat', String)
+)
+
+
+t_plena = Table(
+    'plena', metadata,
+    Column('id', Integer, nullable=False, server_default=text("nextval('plena_id_seq'::regclass)")),
+    Column('avi', String),
+    Column('_0', String),
+    Column('_18', String),
+    Column('_28', String),
+    Column('_29', String),
+    Column('_30', String),
+    Column('_6', String),
+    Column('adreso', String),
+    Column('deleg_fako', String),
+    Column('deleg_loko', String),
+    Column('familianomo', String),
+    Column('jarkat', String),
+    Column('konstkat', String),
+    Column('landokodo', String),
+    Column('naskigxtago', String),
+    Column('notoj', String),
+    Column('personanomo', String),
+    Column('posxtkodo', String),
+    Column('profesio', String),
+    Column('retposxto', String),
+    Column('telhejmo', String),
+    Column('teloficejo', String),
+    Column('tttpagxo', String),
+    Column('ueakodo', String, index=True),
+    Column('urbo', String)
+)
+
+
+t_stat = Table(
+    'stat', metadata,
+    Column('dato', Date),
+    Column('ma', Integer),
+    Column('mat', Integer),
+    Column('mg', Integer),
+    Column('mj', Integer),
+    Column('mjt', Integer),
+    Column('dm', Integer),
+    Column('dmt', Integer),
+    Column('dmj', Integer),
+    Column('dmjt', Integer),
+    Column('hm', Integer),
+    Column('hpk', Integer),
+    Column('dp', Integer),
+    Column('sz', Integer),
+    Column('fc', Integer),
+    Column('pt', Integer),
+    Column('dpt', Integer),
+    Column('thm', Integer),
+    Column('thp', Integer),
+    Column('lsa', Integer),
+    Column('lsn', Integer),
+    Column('fsa', Integer),
+    Column('fsn', Integer),
+    Column('laa', Integer),
+    Column('lan', Integer),
+    Column('faa', Integer),
+    Column('fak', Integer),
+    Column('fan', Integer),
+    Column('lg', Integer),
+    Column('lk', Integer),
+    Column('uk', Integer),
+    Column('sa', Integer),
+    Column('ka', Integer),
+    Column('kto', Integer),
+    Column('kak', Integer),
+    Column('chd', Integer),
+    Column('per', Integer),
+    Column('d', Integer),
+    Column('vd', Integer),
+    Column('fd', Integer),
+    Column('jd', Integer)
+)
+
+
+t_tuta1 = Table(
+    'tuta1', metadata,
+    Column('id', Integer),
+    Column('avi', String),
+    Column('_0', String),
+    Column('_18', String),
+    Column('_28', String),
+    Column('_29', String),
+    Column('_30', String),
+    Column('_6', String),
+    Column('adreso', String),
+    Column('deleg_fako', String),
+    Column('deleg_loko', String),
+    Column('familianomo', String),
+    Column('konstkat', String),
+    Column('landokodo', String),
+    Column('naskigxtago', String),
+    Column('notoj', String),
+    Column('personanomo', String),
+    Column('posxtkodo', String),
+    Column('profesio', String),
+    Column('retposxto', String),
+    Column('telhejmo', String),
+    Column('teloficejo', String),
+    Column('tttpagxo', String),
+    Column('ueakodo', String),
+    Column('urbo', String),
+    Column('jarkat', Text),
+    Column('fakso', String),
+    Column('portebla', String),
+    Column('abc', String)
+)
+
+
+t_uk_alighintoj = Table(
+    'uk_alighintoj', metadata,
+    Column('ueakodo', String(4)),
+    Column('kn', Integer),
+    Column('jaro', Integer)
+)
+
+
+t_ukal = Table(
+    'ukal', metadata,
+    Column('landokodo', String),
+    Column('personanomo', String),
+    Column('familianomo', String),
+    Column('ueakodo', String),
+    Column('urbo', String),
+    Column('abc', Text),
+    Column('landnomo', Text)
+)
+
+
+t_urboj = Table(
+    'urboj', metadata,
+    Column('id', Integer, nullable=False, server_default=text("nextval('urboj_id_seq'::regclass)")),
+    Column('_0', String),
+    Column('_12', String),
+    Column('_14', String),
+    Column('enlogxantoj', String),
+    Column('espgrupo', String),
+    Column('landokodo', String),
+    Column('nomo', String),
+    Column('provinco', String),
+    Column('rimarko', String)
+)
