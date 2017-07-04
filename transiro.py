@@ -15,6 +15,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import create_session
 
 import transir_grupoj
+from TabelTransiro import TabelTransiro
 
 ################
 # ueadb module was generated using
@@ -79,57 +80,14 @@ session_retdb = create_session(bind=engine_retdb)
 engine_novuea = create_engine('mysql://root:@127.0.0.1:3306/novuea?charset=utf8' )
 session_novuea = create_session(bind=engine_novuea)
 
+
+############################# HELPAJ FUNKCIOJ #############################
+
 def db_encode(vorto):
     if vorto is None:
         return ""
     else :
         return vorto.encode('utf-8')
-
-def konverti_landon(session_ueadb):
-    session_novuea.begin()
-    landkodojlist = session_ueadb.query(ueadb.t_landkodoj).all()
-    for lando in landkodojlist:
-        print("Land: {}, ".format(db_encode(lando.landoradiko)))
-        novlando = novuea.Lando(
-                nomoLoka=db_encode(lando.landotraduko), 
-                radikoEo=db_encode(lando.landoradiko), 
-                finajxoEo=db_encode(lando.landofinajxo), 
-                landkodo=db_encode(lando.landduliter))
-        session_novuea.add(novlando)
-    session_novuea.commit()
-
-class Lando(Base):
-    __tablename__ = 'lando'
-
-    id = Column(Integer, primary_key=True)
-    nomoLoka = Column(String(255, 'utf8_unicode_ci'))
-    radikoEo = Column(String(255, 'utf8_unicode_ci'))
-    finajxoEo = Column(String(255, 'utf8_unicode_ci'))
-    landkodo = Column(String(255, 'utf8_unicode_ci'))
-
-
-
-def get_id_lando(landkodo):
-    if landkodo == "nev":
-        raise NeValidaLando("nev")
-    if landkodo == "mrt":
-        print("mrt "+landkodo)
-        raise NeValidaLando("mrt")
-    if landkodo is None:
-        print("ne devus None")
-        raise NeDevusEstiNone("landkodo is None, cannot get id lando")
-    res = session_novuea.execute(select([Lando]).where(Lando.landkodo == landkodo))
-    if(res.rowcount == 0):
-        print("no rezult for "+landkodo)
-        raise MalplenaError("get lando: ne-unika rezulto: "+landkodo)
-    elif(res.rowcount > 1):
-        print("tro da rezult for "+landkodo)
-        raise NeUnikaError("get lando: ne-unika rezulto: "+landkodo)
-    else :
-        print("scal")
-        return res.scalar()
-
-
 
 
 #Por nun, ni nur havas landkategorio A kaj B.
@@ -163,60 +121,50 @@ def karakteroj_al_dato(karakteroj):
     return datetime.date(jaro, monato, tago)
 
 
-    
+############################# HELPAJ FUNKCIOJ FINO #############################
+
+class Lando(Base):
+    __tablename__ = 'lando'
+
+    id = Column(Integer, primary_key=True)
+    nomoLoka = Column(String(255, 'utf8_unicode_ci'))
+    radikoEo = Column(String(255, 'utf8_unicode_ci'))
+    finajxoEo = Column(String(255, 'utf8_unicode_ci'))
+    landkodo = Column(String(255, 'utf8_unicode_ci'))
+
+class TabelTransirLando(TabelTransiro):
+
+    def __init__(self):
+        TabelTransiro.__init__(self)
+
+    def konverti(self, session_ueadb):
+        landkodojlist = session_ueadb.query(ueadb.t_landkodoj).all()
+        for lando in landkodojlist:
+            print("Land: {}, ".format(db_encode(lando.landoradiko)))
+            novlando = novuea.Lando(
+                    nomoLoka=db_encode(lando.landotraduko), 
+                    radikoEo=db_encode(lando.landoradiko), 
+                    finajxoEo=db_encode(lando.landofinajxo), 
+                    landkodo=(lando.landduliter))
+            self.add(novlando.landkodo, novlando)
+
+    def get_id(self, landkodo):
+        if landkodo == "nev":
+            raise NeValidaLando("nev")
+        if landkodo == "mrt":
+            raise NeValidaLando("mrt")
+        if landkodo is None:
+            print("ne devus None")
+            raise NeDevusEstiNone("landkodo is None, cannot get id lando")
+        res = self.trovi(landkodo)
+        if(res is None):
+            print("no rezult for "+landkodo)
+            raise MalplenaError("get lando: malplena rezulto: "+landkodo)
+        else :
+            return res.id
 
 
 ################### URBO ########################
-#Ni ne tuj metas datumojn en la db, sed atendas kolekti ĉiujn el ili por meti
-#en la db. Atendanto, ili estas en urboj_fresxaj
-
-
-
-urboj_fresxaj = {} #urbo aldonita sed ne "commited"
-
-def add_urbo(unomo, unomoEo, uProvinco, ulandokodo):
-    global urboj_fresxaj 
-    if unomo in urboj_fresxaj:
-        #Ni vidas ĉu ni povas riĉigi la objekton
-        nunaUrbo = urboj_fresxaj[unomo]
-        if nunaUrbo.nomoEo is None:
-            nunaUrbo.nomoEo = unomoEo
-        if nunaUrbo.provinco is None:
-            nunaUrbo.provinco = uProvinco 
-        if nunaUrbo.idLando is None:
-            try: 
-                nunaUrbo.idlando = get_id_lando(ulandokodo)
-            except : 
-                nunaUrbo.idLando = None
-        urboj_fresxaj[unomo] = nunaUrbo
-        return
-    try:
-        idlando = get_id_lando(ulandokodo)
-        novurbo = novuea.Urbo(
-                nomoLoka=unomo, 
-                nomoEo=unomoEo, 
-                provinco=uProvinco, 
-                idLando=idlando
-                )
-        urboj_fresxaj[unomo] = novurbo
-    except :
-       if unomo is not None and ulandokodo is None:
-           print("Urbo "+str(unomo)+" ne havas validan landokodon. Aldonita sen ligilo al lando)")
-           novurbo = novuea.Urbo(
-                nomoLoka=unomo, 
-                nomoEo=unomoEo, 
-                provinco=uProvinco, 
-                idLando=None
-                )
-           urboj_fresxaj[unomo] = novurbo
-       elif unomo is not None:
-            print("Ne povis ligi "+str(unomo)+" al lando (landokodo "+str(ulandokodo)+" ne valida)")
-       else :
-           print("Urbo ne havas nomon: ne-konsiderita.")
-
-def purigu_fresxaj_urboj():
-    global urboj_fresxaj 
-    urboj_fresxaj.clear()
 
 class Urbo(Base):
     __tablename__ = 'urbo'
@@ -228,53 +176,94 @@ class Urbo(Base):
     idLando = Column(Integer)
 
 
+class TabelTransirUrbo(TabelTransiro):
+    def __init__(self, transir_lando):
+        TabelTransiro.__init__(self)
+        self.transir_lando = transir_lando
 
-def get_id_urbo(urbonomo):
-    res = session_novuea.execute(select([Urbo]).where(Urbo.nomoLoka == urbonomo))
-    if(res.rowcount == 0):
-        raise MalplenaError("get urbo: ne trovita "+str(urbonomo))
-    elif(res.rowcount > 1):
-        raise NeUnikaError("get urbo: ne-unika rezulto: "+urbonomo)
-    else :
-        return res.scalar()
+    def add_urbo(self, unomo, unomoEo, uProvinco, ulandokodo):
+        if self.ene(unomo) :
+            #Ni vidas ĉu ni povas riĉigi la objekton
+            nunaUrbo = self.trovi(unomo)
+            if nunaUrbo.nomoEo is None:
+                nunaUrbo.nomoEo = unomoEo
+            if nunaUrbo.provinco is None:
+                nunaUrbo.provinco = uProvinco 
+            if nunaUrbo.idLando is None:
+                try: 
+                    nunaUrbo.idlando = self.transir_lando.get_id(ulandokodo)
+                except (NeValidaLando, NeDevusEstiNone, MalplenaError): 
+                    nunaUrbo.idLando = None
+            self.add(unomo, nunaUrbo)
+            return
+        try:
+            print("vivant")
+            idlando = self.transir_lando.get_id(ulandokodo)
+            novurbo = novuea.Urbo(
+                    nomoLoka=unomo, 
+                    nomoEo=unomoEo, 
+                    provinco=uProvinco, 
+                    idLando=idlando
+                    )
+            self.add(unomo, novurbo)
+        except (MalplenaError, NeValidaLando, NeDevusEstiNone):
+           if unomo is not None and ulandokodo is None:
+               print("Urbo "+str(unomo)+" ne havas validan landokodon. Aldonita sen ligilo al lando)")
+               novurbo = novuea.Urbo(
+                    nomoLoka=unomo, 
+                    nomoEo=unomoEo, 
+                    provinco=uProvinco, 
+                    idLando=None
+                    )
+               self.add(unomo, novurbo)
+           elif unomo is not None:
+                print("Ne povis ligi "+str(unomo)+" al lando (landokodo "+str(ulandokodo)+" ne valida)")
+           else :
+               print("Urbo ne havas nomon: ne-konsiderita.")
 
+    def get_id(self, urbonomo):
+        res = self.trovi(urbonomo)
+        if(res is None):
+            raise MalplenaError("get urbo: ne trovita "+str(urbonomo))
+        else :
+            return res.id
+    
+    def konverti(self, session_ueadb):
+        #el tabelo urboj
+        urbolist = session_ueadb.query(ueadb.t_urboj).all()
+        for urbo in urbolist:
+                self.add_urbo(db_encode(urbo.nomo), "", 
+                    db_encode(urbo.provinco), urbo.landokodo)
+        #el tabelo asocio
+        uzantolist = session_ueadb.query(ueadb.t_tuta1).all()
+        for uzanto in uzantolist:
+                self.add_urbo(db_encode(uzanto.urbo), "", "", uzanto.landokodo)
+        #el tabelo tuta1 (uzanto)
+        asociolist = session_ueadb.query(ueadb.t_tuta1).all()
+        for asocio in asociolist:
+                self.add_urbo(db_encode(asocio.urbo), "", "", None)
 
-
-def konverti_urbon(session_ueadb):
-    #el tabelo urboj
-    urbolist = session_ueadb.query(ueadb.t_urboj).all()
-    for urbo in urbolist:
-            add_urbo(db_encode(urbo.nomo), "", 
-                db_encode(urbo.provinco), urbo.landokodo)
-    #el tabelo asocio
-    uzantolist = session_ueadb.query(ueadb.t_tuta1).all()
-    for uzanto in uzantolist:
-            add_urbo(db_encode(uzanto.urbo), "", "", uzanto.landokodo)
-    #el tabelo tuta1 (uzanto)
-    asociolist = session_ueadb.query(ueadb.t_tuta1).all()
-    for asocio in asociolist:
-            add_urbo(db_encode(asocio.urbo), "", "", None)
-    session_novuea.begin()
-    for urbonomo, urbo in urboj_fresxaj.items():
-        session_novuea.add(urbo)
-    session_novuea.commit()
-    purigu_fresxaj_urboj()
 
 ################### URBO FINO ########################
 
-def konverti_faktemon(session_retdb):
-    session_novuea.begin()
-    fakasociolist = session_retdb.query(retdb.t_fakasocioj).add_column("kategorio").distinct()
-    for fakasocio in fakasociolist:
-        novfako = novuea.Faktemo(
-                nomo=db_encode(fakasocio.kategorio), 
-                priskribo=db_encode(fakasocio.kategorio)
-                )
-        session_novuea.add(novfako)
-    session_novuea.commit()
+class TabelTransirFaktemo(TabelTransiro):
+    def __init__(self):
+        TabelTransiro.__init__(self)
+
+    def konverti(self, session_retdb):
+        fakasociolist = session_retdb.query(retdb.t_fakasocioj).add_column("kategorio").distinct()
+        for fakasocio in fakasociolist:
+            novfako = novuea.Faktemo(
+                    nomo=db_encode(fakasocio.kategorio), 
+                    priskribo=db_encode(fakasocio.kategorio)
+                    )
+            self.add(novfako.nomo, novfako)
 
 
 ################### ILOJ RILATE AL GRUPOJ ########################
+
+def get_grupojn():
+    return transir_grupoj.get_grupojn()
 
 class Grupo(Base):
     __tablename__ = 'grupo'
@@ -286,228 +275,284 @@ class Grupo(Base):
     idAsocio = Column(Integer)
 
 
-def get_grupojn():
-    return transir_grupoj.get_grupojn()
+class TabelTransirGrupo(TabelTransiro):
 
-def konverti_grupojn(grupoj):
-    session_novuea.begin()
-    for k_mlg, grupo in grupoj.items() :
-        session_novuea.add(grupo)
-    session_novuea.commit()
+    def konstkat_konvertilo(self, string, grupoj):
+        sep =';'
+        i = 0
+        konstkat_grupoj = set()
+        for code in string.split(sep):
+            code = re.sub('#[0-9]*', "", code)
+            if code in grupoj:
+                konstkat_grupoj.add(self.get_id(code))
+                i = i+1
+            else:
+                print(code+" ne trovita en la grupoj sed atendita.")
+        return konstkat_grupoj 
+    
+    def __init__(self):
+        TabelTransiro.__init__(self)
 
-def get_id_grupo(mallongigilo):
-    res = session_novuea.execute(select([Grupo]).where(Grupo.mallongigilo == mallongigilo))
-    if(res.rowcount == 0):
-        raise MalplenaError("get grupo: ne konata grupo: "+ mallongigilo)
-    elif(res.rowcount > 1):
-        raise NeUnikaError("get grupo: ne-unika rezulto: "+ mallongigilo)
-    else :
-        return res.scalar()
+    def konverti(self, grupoj):
+        for k_mlg, grupo in grupoj.items() :
+            self.add(k_mlg, grupo)
 
-
-def konstkat_konvertilo(string, grupoj):
-    sep =';'
-    i = 0
-    konstkat_grupoj = set()
-    for code in string.split(sep):
-        code = re.sub('#[0-9]*', "", code)
-        if code in grupoj:
-            konstkat_grupoj.add(get_id_grupo(code))
-            i = i+1
-        else:
-            print(code+" ne trovita en la grupoj sed atendita.")
-    return konstkat_grupoj 
+    def get_id(self, mallongigilo):
+        res = self.trovi(mallongigilo)
+        if(res is None):
+            raise MalplenaError("get grupo: ne konata grupo: "+ mallongigilo)
+        else :
+            return res.id
 
 
 ################### FINO ILOJ RILATE AL GRUPOJ ########################
+
+#Iom specifa ĉar plenigita nur de TabelTransirAsocio kaj TabelTransirUzanto
+def TabelTransirAsocioAuxUzanto(TabelTransiro):
+
+    def __init__(self):
+        TabelTransiro.__init__(self)
+    
+
+
 ###################  RILATE AL ASOCIOJ ########################
-
-def estas_faka(ueadb_asocio):
-    set_grupoj = konstkat_konvertilo(ueadb_asocio.konstkat , get_grupojn())
-    #if intersection is not empty, then True
-    return len ({"fa.a", "fa.k", "fa.n", "fs.a"} & set_grupoj) != 0
-
-def estas_landa(ueadb_asocio):
-    set_grupoj = konstkat_konvertilo(ueadb_asocio.konstkat , get_grupojn())
-    #if intersection is not empty, then True
-    return len ({"la.a", "la.n", "ls.a", "ls.n"} & set_grupoj) != 0
-
-def estas_junulara(ueadb_asocio):
-    set_grupoj = konstkat_konvertilo(ueadb_asocio.konstkat , get_grupojn())
-    #if intersection is not empty, then True
-    return len ({"fs.a", "ls.a", "ls.n"} & set_grupoj) != 0
-
 
 #globala variablo: permesas sinkronigi la id de la tabeloj uzantoAuxAsocio, asocio kaj uzanto.
 venonta_id_uzantoAuxAsocio = 1
 
-def konverti_asocion(session_ueadb):
-    global venonta_id_uzantoAuxAsocio
-    session_novuea.begin()
-    asociolist = session_ueadb.query(ueadb.t_asocioj).all()
-    #fakasociolist = session_retdb.query(retdb.t_fakasocioj).add_column("kategorio").distinct()
-    for asocio in asociolist:
-        novUzantoAuxAsocio = novuea.UzantoAuxAsocio(
-                id = venonta_id_uzantoAuxAsocio,
-                ueakodo = asocio.ueakodo
-                )
-        idurbo = None
-        try :
-            idurbo = get_id_urbo(asocio.urbo)
-        except (NeUnikaError, MalplenaError) :
-            if asocio.urbo is None:
-                print("Asocio: la asocio "+asocio.familianomo+" ne estas ligita al iu urbo")
-            else:
-                print("Asocio "+asocio.familianomo+": Ne povis ligi "+asocio.urbo+" al urbo ĉar la nomo estas plurfoje trovita en la datumbazo")
-            idurbo= None
-        
-        session_novuea.add(novUzantoAuxAsocio)
-        novAsocio = novuea.Asocio(
-                id = venonta_id_uzantoAuxAsocio ,
-                nomo= asocio.familianomo,
-                siglo= "",
-                adreso= asocio.adreso,
-                fondigxdato= None,
-                posxtkodo= asocio.posxtkodo,
-                idUrbo= idurbo ,
-                idFako= None,
-                lando= None,
-                telhejmo= asocio.telhejmo,
-                retposxto= asocio.retposxto,
-                delegFako= asocio.deleg_fako,
-                tttpagxo= asocio.tttpagxo,
-                junulara= estas_junulara(asocio),
-                faka= estas_faka(asocio),
-                landa= estas_landa(asocio),
-                abc= asocio.abc
-                )
-        venonta_id_uzantoAuxAsocio = venonta_id_uzantoAuxAsocio + 1
-        print("int :"+str(venonta_id_uzantoAuxAsocio))
-        session_novuea.add(novAsocio)
-    session_novuea.commit()
+
+venonta_id_uzantoAuxAsocio  =  1 
+class TabelTransirAsocio(TabelTransiro):
+
+    def __init__(self, transir_urbo, transir_asocioAuxUzanto, transir_grupoj):
+        TabelTransiro.__init__(self)
+        self.transir_urbo = transir_urbo
+        self.transir_asocioAuxUzanto = transir_asocioAuxUzanto
+        self.transir_grupoj = transir_grupoj
+    
+    def estas_faka(self, ueadb_asocio):
+        set_grupoj = self.transir_grupoj.konstkat_konvertilo(ueadb_asocio.konstkat , get_grupojn())
+        #if intersection is not empty, then True
+        return len ({"fa.a", "fa.k", "fa.n", "fs.a"} & set_grupoj) != 0
+    
+    def estas_landa(self, ueadb_asocio):
+        set_grupoj = self.transir_grupoj.konstkat_konvertilo(ueadb_asocio.konstkat , get_grupojn())
+        #if intersection is not empty, then True
+        return len ({"la.a", "la.n", "ls.a", "ls.n"} & set_grupoj) != 0
+    
+    def estas_junulara(self, ueadb_asocio):
+        set_grupoj = self.transir_grupoj.konstkat_konvertilo(ueadb_asocio.konstkat , get_grupojn())
+        #if intersection is not empty, then True
+        return len ({"fs.a", "ls.a", "ls.n"} & set_grupoj) != 0
+
+
+    def konverti(self, session_ueadb ):
+        global venonta_id_uzantoAuxAsocio
+        asociolist = session_ueadb.query(ueadb.t_asocioj).all()
+        #fakasociolist = session_retdb.query(retdb.t_fakasocioj).add_column("kategorio").distinct()
+        for asocio in asociolist:
+            novUzantoAuxAsocio = novuea.UzantoAuxAsocio(
+                    id = venonta_id_uzantoAuxAsocio,
+                    ueakodo = asocio.ueakodo
+                    )
+            idurbo = None
+            asocia_nomo = asocio.familianomo
+            if(asocia_nomo is None):
+                asocia_nomo = asocio.personanomo
+            try :
+                idurbo = self.transir_urbo.get_id(asocio.urbo)
+            except (NeUnikaError, MalplenaError) :
+                if asocio.urbo is None:
+                    print("Asocio: la asocio "+asocia_nomo+" ne estas ligita al iu urbo")
+                else:
+                    print("Asocio "+asocia_nomo+": Ne povis ligi "+asocio.urbo+" al urbo ĉar la nomo estas plurfoje trovita en la datumbazo")
+                idurbo= None
+            
+            self.transir_asocioAuxUzanto.add(novUzantoAuxAsocio.ueakodo, novUzantoAuxAsocio)
+            novAsocio = novuea.Asocio(
+                    id = venonta_id_uzantoAuxAsocio ,
+                    nomo= asocia_nomo,
+                    siglo= "",
+                    adreso= asocio.adreso,
+                    fondigxdato= None,
+                    posxtkodo= asocio.posxtkodo,
+                    idUrbo= idurbo ,
+                    idFako= None,
+                    lando= None,
+                    telhejmo= asocio.telhejmo,
+                    retposxto= asocio.retposxto,
+                    delegFako= asocio.deleg_fako,
+                    tttpagxo= asocio.tttpagxo,
+                    junulara= self.estas_junulara(asocio),
+                    faka= self.estas_faka(asocio),
+                    landa= self.estas_landa(asocio),
+                    abc= asocio.abc
+                    )
+            venonta_id_uzantoAuxAsocio = venonta_id_uzantoAuxAsocio + 1
+            self.add(novAsocio.nomo, novAsocio)
 
 ###################  FINO RILATE AL ASOCIOJ ########################
 ###################  RILATE AL UZANTOJ ########################
 
-def konverti_uzanto(session_ueadb):
-    global venonta_id_uzantoAuxAsocio
-    def get_titolon_personan_nomon(personanomo):
-        abrevs = ["S-ro", "S-ino", "D-ro", "D-ino", "F-o", "F-ino", "Prof.", "Mag.", "Inĝ.", "G-o", "G-ino", "D-o", "D-ino" ]
-        def check_abrev (nomo, abrev):
-            if personanomo is None:
-                return (None, None)
-            pattern = re.compile(abrev+' (.*)')
-            res = pattern.match(personanomo)
-            if res is None:
-                return (None, personanomo)
-            else:
-                return (abrev, res.group(1))
-        titolo = ""
-        found = 1 
-        while found == 1:
-            found = 0 
-            for abrev in abrevs:
-                (novtitolo, personanomo) = check_abrev(personanomo, abrev)
-                if novtitolo is not None:
-                    found = 1
-                    titolo = titolo +" "+ novtitolo
-        return (titolo, personanomo)
+def get_titolon_personan_nomon(personanomo):
+    abrevs = ["S-ro", "S-ino", "D-ro", "D-ino", "F-o", "F-ino", "Prof.", "Mag.", "Inĝ.", "G-o", "G-ino", "D-o", "D-ino" ]
+    def check_abrev (nomo, abrev):
+        if personanomo is None:
+            return (None, None)
+        pattern = re.compile(abrev+' (.*)')
+        res = pattern.match(personanomo)
+        if res is None:
+            return (None, personanomo)
+        else:
+            return (abrev, res.group(1))
+    titolo = ""
+    found = 1 
+    while found == 1:
+        found = 0 
+        for abrev in abrevs:
+            (novtitolo, personanomo) = check_abrev(personanomo, abrev)
+            if novtitolo is not None:
+                found = 1
+                titolo = titolo +" "+ novtitolo
+    return (titolo, personanomo)
+ 
 
-    session_novuea.begin()
-    uzantolist = session_ueadb.query(ueadb.t_tuta1).all()
-    for uzanto in uzantolist:
-        novUzantoAuxAsocio = novuea.UzantoAuxAsocio(
-                id = venonta_id_uzantoAuxAsocio,
-                ueakodo = uzanto.ueakodo
-                )
-        lando = None
-        valida = True
-        morta = False
-        try: 
-            lando = get_id_lando(uzanto.landokodo) 
-        except NeValidaLando as e: 
+class TabelTransirUzanto(TabelTransiro):
+
+    def __init__(self, transir_lando, transir_urbo, transir_asocioAuxUzanto):
+        TabelTransiro.__init__(self)
+        self.transir_lando = transir_lando
+        self.transir_urbo = transir_urbo
+        self.transir_asocioAuxUzanto = transir_asocioAuxUzanto
+
+
+    def konverti(self, session_ueadb ):
+        global venonta_id_uzantoAuxAsocio
+   
+        uzantolist = session_ueadb.query(ueadb.t_tuta1).all()
+        for uzanto in uzantolist:
+            novUzantoAuxAsocio = novuea.UzantoAuxAsocio(
+                    id = venonta_id_uzantoAuxAsocio,
+                    ueakodo = uzanto.ueakodo
+                    )
+            self.transir_asocioAuxUzanto.add(novUzantoAuxAsocio.ueakodo,novUzantoAuxAsocio)
             lando = None
-            if str(e) == "nev":
-                valida = False
-            if str(e) == "mrt":
-                morta = True
-        urbo = None
-        try:
-            urbo = get_id_urbo(uzanto.urbo)
-        except MalplenaError:
+            valida = True
+            morta = False
+            try: 
+                lando = self.transir_lando.get_id(uzanto.landokodo) 
+            except NeValidaLando as e: 
+                lando = None
+                if str(e) == "nev":
+                    valida = False
+                if str(e) == "mrt":
+                    morta = True
+            except MalplenaError : 
+                lando = None
             urbo = None
+            try:
+                urbo = self.transir_urbo.get_id(uzanto.urbo)
+            except MalplenaError:
+                urbo = None
+    
+            (titolo, personanomo) = get_titolon_personan_nomon(uzanto.personanomo)
+            novUzanto = novuea.Uzanto(
+                id = venonta_id_uzantoAuxAsocio,
+                personanomo = personanomo,
+                familianomo = uzanto.familianomo,
+                titolo = titolo,
+                bildo = "",
+                personanomoIdentigilo = "", 
+                familianomoIdentigilo = "",
+                adreso = uzanto.adreso,
+                posxtkodo = uzanto.posxtkodo,
+                idLogxurbo = urbo,
+                idlando = lando,
+                naskigxtago = karakteroj_al_dato(uzanto.naskigxtago),
+                morta = morta,
+                mortdatekscio = None,
+                mortdato = None,
+                notoj = uzanto.notoj,
+                profesio = uzanto.profesio,
+                retposxto = uzanto.retposxto,
+                telhejmo  = uzanto.telhejmo,
+                teloficejo = uzanto.teloficejo,
+                telportebla = uzanto.portebla,
+                kerekzameno = False,
+                kernivelo = None,
+                kerdato = None,
+                tttpagxo = uzanto.tttpagxo,
+                validaKonto = valida,
+                abc = uzanto.abc
+            )
+            self.add((novUzanto.personanomo, novUzanto.familianomo), novUzanto)
+            venonta_id_uzantoAuxAsocio = venonta_id_uzantoAuxAsocio + 1
 
-        (titolo, personanomo) = get_titolon_personan_nomon(uzanto.personanomo)
-        novUzanto = novuea.Uzanto(
-            id = venonta_id_uzantoAuxAsocio,
-            personanomo = personanomo,
-            familianomo = uzanto.familianomo,
-            titolo = titolo,
-            bildo = "",
-            personanomoIdentigilo = "", 
-            familianomoIdentigilo = "",
-            adreso = uzanto.adreso,
-            posxtkodo = uzanto.posxtkodo,
-            idLogxurbo = urbo,
-            idlando = lando,
-            naskigxtago = karakteroj_al_dato(uzanto.naskigxtago),
-            morta = morta,
-            mortdatekscio = None,
-            mortdato = None,
-            notoj = uzanto.notoj,
-            profesio = uzanto.profesio,
-            retposxto = uzanto.retposxto,
-            telhejmo  = uzanto.telhejmo,
-            teloficejo = uzanto.teloficejo,
-            telportebla = uzanto.portebla,
-            kerekzameno = False,
-            kernivelo = None,
-            kerdato = None,
-            tttpagxo = uzanto.tttpagxo,
-            validaKonto = valida,
-            abc = uzanto.abc
-        )
-        session_novuea.add(novUzanto)
-        venonta_id_uzantoAuxAsocio = venonta_id_uzantoAuxAsocio + 1
-    session_novuea.commit()
-
-def get_id_uzanto_aux_asocio(familinomo, personanomo):
+def get_id_uzanto_aux_asocio(familianomo, personanomo, transir_asocio, transir_uzanto):
     #ni unue rigardas ene de la asocioj
-    res = session_novuea.execute(select([Asocio]).where(Asocio.nomo == familianomo))
-    if(res.rowcount == 0):
+    res = transir_asocio.trovi(familianomo)
+    if(res is None ):
         #ni rigardu ĉe uzantoj
-        res = session_novuea.execute(select([Uzanto]).where(Uzanto.familianomo == familianomo).where(Uzanto.personanomo == personanomo))
-        if(res.rowcount == 0):
+        res = transir_uzanto.trovi((personanomo, familianomo))
+        if(res is None):
             raise MalplenaError("uzanto ne trovita: "+personanomo+" "+familianomo)
-        elif(res.rowcount > 1):
-            raise NeUnikaError("Pluraj homoj havas saman nomon, ne povas identigi certecen: "+personanomo+" "+familianomo)
         else :
-            return res.scalar()
-    elif(res.rowcount > 1):
-        raise NeUnikaError("get uzanto_aux_asocio : ne-unika rezulto (sufice problema): la sama asocio plurfoje trovita: "+familianomo)
+            return res.id
     else :
-        return res.scalar()
+        return res.id
 
 
+class TabelTransirPeranto(TabelTransiro):
+    def __init__(self, transir_asocio, transir_uzanto, transir_lando):
+        TabelTransiro.__init__(self)
+        self.transir_asocio = transir_asocio
+        self.transir_uzanto = transir_uzanto
+        self.transir_lando = transir_lando
 
 
-def konverti_peranton():
-    perantolist = session_ueadb.query(ueadb.perant).all()
-    for peranto in perantolist:
-        (titolo, personanomo) = get_titolon_personan_nomon(peranto.personanomo)
-        id_uzantoAuxAsocio = get_id_uzanto_aux_asocio(peranto.familianomo, personanomo)
-        novPeranto = novuea.Peranto(
-                idUeaKodo = id_uzantoAuxAsocio,
-                idLando = get_id_lando(peranto.landokodo)
-                )
-        session_novuea.add(novPeranto)
-    session_novuea.commit()
+    def konverti(self, session_ueadb):
+        perantolist = session_ueadb.query(ueadb.t_perant).all()
+        for peranto in perantolist:
+            (titolo, personanomo) = get_titolon_personan_nomon(peranto.personanomo)
+            id_uzantoAuxAsocio = get_id_uzanto_aux_asocio(peranto.familianomo, personanomo, self.transir_asocio, self.transir_uzanto)
+
+            novPeranto = novuea.Peranto(
+                    idUeakodo = id_uzantoAuxAsocio,
+                    idLando = self.transir_lando.get_id(db_encode(peranto.landokodo))
+                    )
+            self.add(novPeranto.idUeakodo, novPeranto)
+
+konv_landon = TabelTransirLando()
+konv_landon.konverti(session_ueadb)
+
+konv_urbon = TabelTransirUrbo(konv_landon)
+konv_urbon.konverti(session_ueadb)
 
 
+konv_faktemon = TabelTransirFaktemo()
+konv_faktemon.konverti(session_retdb)
 
-#konverti_landon(session_ueadb)
-#konverti_urbon(session_ueadb)
-#konverti_faktemon(session_retdb)
-#konverti_grupojn(get_grupojn())
-#konverti_asocion(session_ueadb)
-konverti_uzanto(session_ueadb)
+konv_grupon = TabelTransirGrupo()
+konv_grupon.konverti(get_grupojn())
+
+konv_asocionAuxUzanto = TabelTransiro()
+
+konv_asocion = TabelTransirAsocio(konv_urbon, konv_asocionAuxUzanto, konv_grupon)
+konv_asocion.konverti(session_ueadb, )
+
+konv_uzanton = TabelTransirUzanto(konv_landon, konv_urbon, konv_asocionAuxUzanto)
+konv_uzanton.konverti(session_ueadb)
+
+konv_peranto = TabelTransirPeranto(konv_asocion, konv_uzanton, konv_landon)
+konv_peranto.konverti(session_ueadb)
+
+  
+konv_landon.commit(session_novuea)
+konv_urbon.commit(session_novuea)
+konv_faktemon.commit(session_novuea)
+konv_grupon.commit(session_novuea)
+konv_asocion.commit(session_novuea)
+konv_asocionAuxUzanto.commit(session_novuea)
+konv_uzanton.commit(session_novuea)
+konv_asocionAuxUzanto.commit(session_novuea)
+konv_peranto.commit(session_novuea)
