@@ -1,6 +1,12 @@
 import os
+import re
 import sys
 import sqlalchemy
+import datetime
+
+from datetime import date
+
+
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -49,6 +55,10 @@ class DevusEkzistiError(TransirError):
 class NeDevusEstiNone(TransirError):
     """Variable kiu ne devus esti None, estas."""
     pass
+class NeValidaLando(TransirError):
+    """Ne valida datumo."""
+    pass
+
 
 
 
@@ -63,7 +73,7 @@ engine_retdb = create_engine('postgresql://postgres:kukurbeto@127.0.0.1:5432/ret
 #Create a session to use the tables    
 session_retdb = create_session(bind=engine_retdb)
 
-
+#bonvolu kredi la bazon kun la collation utf8_bin
 
 #Connect to the new db
 engine_novuea = create_engine('mysql://root:@127.0.0.1:3306/novuea?charset=utf8' )
@@ -100,14 +110,23 @@ class Lando(Base):
 
 
 def get_id_lando(landkodo):
+    if landkodo == "nev":
+        raise NeValidaLando("nev")
+    if landkodo == "mrt":
+        print("mrt "+landkodo)
+        raise NeValidaLando("mrt")
     if landkodo is None:
+        print("ne devus None")
         raise NeDevusEstiNone("landkodo is None, cannot get id lando")
     res = session_novuea.execute(select([Lando]).where(Lando.landkodo == landkodo))
     if(res.rowcount == 0):
+        print("no rezult for "+landkodo)
         raise MalplenaError("get lando: ne-unika rezulto: "+landkodo)
     elif(res.rowcount > 1):
+        print("tro da rezult for "+landkodo)
         raise NeUnikaError("get lando: ne-unika rezulto: "+landkodo)
     else :
+        print("scal")
         return res.scalar()
 
 
@@ -125,9 +144,52 @@ def konverti_lando_landkategorion(session_ueadb):
     nop
 #TODO
 
-################### URBO ########################
 
-def add_urbo(session, unomo, unomoEo, uProvinco, ulandokodo):
+def karakteroj_al_dato(karakteroj):
+    if karakteroj is None:
+        return None
+    sep = "\/"
+    print("date: "+karakteroj)
+    date_pattern = re.compile('([0-9]{4})'+sep+'([0-9]{2})'+sep+'([0-9]{2})')
+    res = date_pattern.match(karakteroj)
+    if res is None:
+        print("Ne povis krei daton "+karakteroj)
+        return None
+    (jaro, monato, tago) = (int(res.group(1)), int(res.group(2)), int(res.group(3)))
+    if monato == 0:
+        monato = 1
+    if tago == 0:
+        tago = 1
+    return datetime.date(jaro, monato, tago)
+
+
+    
+
+
+################### URBO ########################
+#Ni ne tuj metas datumojn en la db, sed atendas kolekti ĉiujn el ili por meti
+#en la db. Atendanto, ili estas en urboj_fresxaj
+
+
+
+urboj_fresxaj = {} #urbo aldonita sed ne "commited"
+
+def add_urbo(unomo, unomoEo, uProvinco, ulandokodo):
+    global urboj_fresxaj 
+    if unomo in urboj_fresxaj:
+        #Ni vidas ĉu ni povas riĉigi la objekton
+        nunaUrbo = urboj_fresxaj[unomo]
+        if nunaUrbo.nomoEo is None:
+            nunaUrbo.nomoEo = unomoEo
+        if nunaUrbo.provinco is None:
+            nunaUrbo.provinco = uProvinco 
+        if nunaUrbo.idLando is None:
+            try: 
+                nunaUrbo.idlando = get_id_lando(ulandokodo)
+            except : 
+                nunaUrbo.idLando = None
+        urboj_fresxaj[unomo] = nunaUrbo
+        return
     try:
         idlando = get_id_lando(ulandokodo)
         novurbo = novuea.Urbo(
@@ -136,8 +198,8 @@ def add_urbo(session, unomo, unomoEo, uProvinco, ulandokodo):
                 provinco=uProvinco, 
                 idLando=idlando
                 )
-        session.add(novurbo)
-    except (NeUnikaError, MalplenaError, DevusEkzistiError, NeDevusEstiNone):
+        urboj_fresxaj[unomo] = novurbo
+    except :
        if unomo is not None and ulandokodo is None:
            print("Urbo "+str(unomo)+" ne havas validan landokodon. Aldonita sen ligilo al lando)")
            novurbo = novuea.Urbo(
@@ -146,11 +208,15 @@ def add_urbo(session, unomo, unomoEo, uProvinco, ulandokodo):
                 provinco=uProvinco, 
                 idLando=None
                 )
-           session.add(novurbo)
+           urboj_fresxaj[unomo] = novurbo
        elif unomo is not None:
-            print("Ne povis ligi "+unomo+" al lando (landokodo "+ulandokodo+" ne valida)")
+            print("Ne povis ligi "+str(unomo)+" al lando (landokodo "+str(ulandokodo)+" ne valida)")
        else :
            print("Urbo ne havas nomon: ne-konsiderita.")
+
+def purigu_fresxaj_urboj():
+    global urboj_fresxaj 
+    urboj_fresxaj.clear()
 
 class Urbo(Base):
     __tablename__ = 'urbo'
@@ -166,31 +232,33 @@ class Urbo(Base):
 def get_id_urbo(urbonomo):
     res = session_novuea.execute(select([Urbo]).where(Urbo.nomoLoka == urbonomo))
     if(res.rowcount == 0):
-        raise MalplenaError("get urbo: ne-unika rezulto: "+str(urbonomo))
+        raise MalplenaError("get urbo: ne trovita "+str(urbonomo))
     elif(res.rowcount > 1):
         raise NeUnikaError("get urbo: ne-unika rezulto: "+urbonomo)
     else :
         return res.scalar()
 
+
+
 def konverti_urbon(session_ueadb):
-    session_novuea.begin()
     #el tabelo urboj
     urbolist = session_ueadb.query(ueadb.t_urboj).all()
     for urbo in urbolist:
-        add_urbo(session_novuea, db_encode(urbo.nomo), "", 
+            add_urbo(db_encode(urbo.nomo), "", 
                 db_encode(urbo.provinco), urbo.landokodo)
     #el tabelo asocio
-    session_novuea.commit()
-    session_novuea.begin()
-    asociolist = session_ueadb.query(ueadb.t_asocioj).all()
+    uzantolist = session_ueadb.query(ueadb.t_tuta1).all()
+    for uzanto in uzantolist:
+            add_urbo(db_encode(uzanto.urbo), "", "", uzanto.landokodo)
+    #el tabelo tuta1 (uzanto)
+    asociolist = session_ueadb.query(ueadb.t_tuta1).all()
     for asocio in asociolist:
-        try :
-            idurbo = get_id_urbo(asocio.urbo)
-        except MalplenaError :
-            add_urbo(session_novuea, db_encode(asocio.urbo), "", "", None)
-        except NeUnikaError :
-            print("Asocio: Ne povis ligi "+asocio.urbo+"al urbo ĉar la nomo estas plurfoje trovita en la datumbazo")
+            add_urbo(db_encode(asocio.urbo), "", "", None)
+    session_novuea.begin()
+    for urbonomo, urbo in urboj_fresxaj.items():
+        session_novuea.add(urbo)
     session_novuea.commit()
+    purigu_fresxaj_urboj()
 
 ################### URBO FINO ########################
 
@@ -242,6 +310,7 @@ def konstkat_konvertilo(string, grupoj):
     i = 0
     konstkat_grupoj = set()
     for code in string.split(sep):
+        code = re.sub('#[0-9]*', "", code)
         if code in grupoj:
             konstkat_grupoj.add(get_id_grupo(code))
             i = i+1
@@ -269,14 +338,17 @@ def estas_junulara(ueadb_asocio):
     return len ({"fs.a", "ls.a", "ls.n"} & set_grupoj) != 0
 
 
-
+#globala variablo: permesas sinkronigi la id de la tabeloj uzantoAuxAsocio, asocio kaj uzanto.
+venonta_id_uzantoAuxAsocio = 1
 
 def konverti_asocion(session_ueadb):
+    global venonta_id_uzantoAuxAsocio
     session_novuea.begin()
     asociolist = session_ueadb.query(ueadb.t_asocioj).all()
     #fakasociolist = session_retdb.query(retdb.t_fakasocioj).add_column("kategorio").distinct()
     for asocio in asociolist:
         novUzantoAuxAsocio = novuea.UzantoAuxAsocio(
+                id = venonta_id_uzantoAuxAsocio,
                 ueakodo = asocio.ueakodo
                 )
         idurbo = None
@@ -289,15 +361,16 @@ def konverti_asocion(session_ueadb):
                 print("Asocio "+asocio.familianomo+": Ne povis ligi "+asocio.urbo+" al urbo ĉar la nomo estas plurfoje trovita en la datumbazo")
             idurbo= None
         
+        session_novuea.add(novUzantoAuxAsocio)
         novAsocio = novuea.Asocio(
-                id = novUzantoAuxAsocio.id ,
+                id = venonta_id_uzantoAuxAsocio ,
                 nomo= asocio.familianomo,
                 siglo= "",
                 adreso= asocio.adreso,
                 fondigxdato= None,
                 posxtkodo= asocio.posxtkodo,
-                urbo= idurbo ,
-                fako= None,
+                idUrbo= idurbo ,
+                idFako= None,
                 lando= None,
                 telhejmo= asocio.telhejmo,
                 retposxto= asocio.retposxto,
@@ -307,11 +380,128 @@ def konverti_asocion(session_ueadb):
                 faka= estas_faka(asocio),
                 landa= estas_landa(asocio),
                 abc= asocio.abc
-
                 )
+        venonta_id_uzantoAuxAsocio = venonta_id_uzantoAuxAsocio + 1
+        print("int :"+str(venonta_id_uzantoAuxAsocio))
         session_novuea.add(novAsocio)
     session_novuea.commit()
 
+###################  FINO RILATE AL ASOCIOJ ########################
+###################  RILATE AL UZANTOJ ########################
+
+def konverti_uzanto(session_ueadb):
+    global venonta_id_uzantoAuxAsocio
+    def get_titolon_personan_nomon(personanomo):
+        abrevs = ["S-ro", "S-ino", "D-ro", "D-ino", "F-o", "F-ino", "Prof.", "Mag.", "Inĝ.", "G-o", "G-ino", "D-o", "D-ino" ]
+        def check_abrev (nomo, abrev):
+            if personanomo is None:
+                return (None, None)
+            pattern = re.compile(abrev+' (.*)')
+            res = pattern.match(personanomo)
+            if res is None:
+                return (None, personanomo)
+            else:
+                return (abrev, res.group(1))
+        titolo = ""
+        found = 1 
+        while found == 1:
+            found = 0 
+            for abrev in abrevs:
+                (novtitolo, personanomo) = check_abrev(personanomo, abrev)
+                if novtitolo is not None:
+                    found = 1
+                    titolo = titolo +" "+ novtitolo
+        return (titolo, personanomo)
+
+    session_novuea.begin()
+    uzantolist = session_ueadb.query(ueadb.t_tuta1).all()
+    for uzanto in uzantolist:
+        novUzantoAuxAsocio = novuea.UzantoAuxAsocio(
+                id = venonta_id_uzantoAuxAsocio,
+                ueakodo = uzanto.ueakodo
+                )
+        lando = None
+        valida = True
+        morta = False
+        try: 
+            lando = get_id_lando(uzanto.landokodo) 
+        except NeValidaLando as e: 
+            lando = None
+            if str(e) == "nev":
+                valida = False
+            if str(e) == "mrt":
+                morta = True
+        urbo = None
+        try:
+            urbo = get_id_urbo(uzanto.urbo)
+        except MalplenaError:
+            urbo = None
+
+        (titolo, personanomo) = get_titolon_personan_nomon(uzanto.personanomo)
+        novUzanto = novuea.Uzanto(
+            id = venonta_id_uzantoAuxAsocio,
+            personanomo = personanomo,
+            familianomo = uzanto.familianomo,
+            titolo = titolo,
+            bildo = "",
+            personanomoIdentigilo = "", 
+            familianomoIdentigilo = "",
+            adreso = uzanto.adreso,
+            posxtkodo = uzanto.posxtkodo,
+            idLogxurbo = urbo,
+            idlando = lando,
+            naskigxtago = karakteroj_al_dato(uzanto.naskigxtago),
+            morta = morta,
+            mortdatekscio = None,
+            mortdato = None,
+            notoj = uzanto.notoj,
+            profesio = uzanto.profesio,
+            retposxto = uzanto.retposxto,
+            telhejmo  = uzanto.telhejmo,
+            teloficejo = uzanto.teloficejo,
+            telportebla = uzanto.portebla,
+            kerekzameno = False,
+            kernivelo = None,
+            kerdato = None,
+            tttpagxo = uzanto.tttpagxo,
+            validaKonto = valida,
+            abc = uzanto.abc
+        )
+        session_novuea.add(novUzanto)
+        venonta_id_uzantoAuxAsocio = venonta_id_uzantoAuxAsocio + 1
+    session_novuea.commit()
+
+def get_id_uzanto_aux_asocio(familinomo, personanomo):
+    #ni unue rigardas ene de la asocioj
+    res = session_novuea.execute(select([Asocio]).where(Asocio.nomo == familianomo))
+    if(res.rowcount == 0):
+        #ni rigardu ĉe uzantoj
+        res = session_novuea.execute(select([Uzanto]).where(Uzanto.familianomo == familianomo).where(Uzanto.personanomo == personanomo))
+        if(res.rowcount == 0):
+            raise MalplenaError("uzanto ne trovita: "+personanomo+" "+familianomo)
+        elif(res.rowcount > 1):
+            raise NeUnikaError("Pluraj homoj havas saman nomon, ne povas identigi certecen: "+personanomo+" "+familianomo)
+        else :
+            return res.scalar()
+    elif(res.rowcount > 1):
+        raise NeUnikaError("get uzanto_aux_asocio : ne-unika rezulto (sufice problema): la sama asocio plurfoje trovita: "+familianomo)
+    else :
+        return res.scalar()
+
+
+
+
+def konverti_peranton():
+    perantolist = session_ueadb.query(ueadb.perant).all()
+    for peranto in perantolist:
+        (titolo, personanomo) = get_titolon_personan_nomon(peranto.personanomo)
+        id_uzantoAuxAsocio = get_id_uzanto_aux_asocio(peranto.familianomo, personanomo)
+        novPeranto = novuea.Peranto(
+                idUeaKodo = id_uzantoAuxAsocio,
+                idLando = get_id_lando(peranto.landokodo)
+                )
+        session_novuea.add(novPeranto)
+    session_novuea.commit()
 
 
 
@@ -319,4 +509,5 @@ def konverti_asocion(session_ueadb):
 #konverti_urbon(session_ueadb)
 #konverti_faktemon(session_retdb)
 #konverti_grupojn(get_grupojn())
-konverti_asocion(session_ueadb)
+#konverti_asocion(session_ueadb)
+konverti_uzanto(session_ueadb)

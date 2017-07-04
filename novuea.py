@@ -12,27 +12,25 @@ class Administranto(Base):
 
     id = Column(Integer, primary_key=True)
     idUzantoAuxAsocio = Column(Integer)
-    uzantnomo = Column(String(255, 'utf8_unicode_ci'))
-    pasvorto = Column(String(255, 'utf8_unicode_ci'))
+    uzantnomo = Column(String(255, 'utf8_bin'))
+    pasvortoHash = Column(Text(collation='utf8_bin'))
+    pasvortoSalt = Column(Text(collation='utf8_bin'))
 
 
 class Adminrajto(Base):
     __tablename__ = 'adminrajto'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
 
 
-class Aligxkotizo(Base):
-    __tablename__ = 'aligxkotizo'
+class Aligxperiodo(Base):
+    __tablename__ = 'aligxperiodo'
 
     id = Column(Integer, primary_key=True)
-    idKongreso = Column(Integer)
-    prezo = Column(Integer)
-    gxis_naskigxjaro = Column(Date)
-    landKategorio = Column(Integer)
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    komencdato = Column(Date)
+    findato = Column(Date)
 
 
 class Aneckotizo(Base):
@@ -40,7 +38,7 @@ class Aneckotizo(Base):
 
     id = Column(Integer, primary_key=True)
     prezo = Column(Integer)
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    priskribo = Column(String(255, 'utf8_bin'))
     gxis_naskigxjaro = Column(Date)
     landKategorio = Column(Integer)
     idGrupo = Column(Integer)
@@ -55,34 +53,36 @@ class Aneco(Base):
     komencdato = Column(Date)
     findato = Column(Date)
     dumviva = Column(Integer)
-    tasko = Column(String(255, 'utf8_unicode_ci'))
-    respondeco = Column(String(255, 'utf8_unicode_ci'))
+    tasko = Column(String(255, 'utf8_bin'))
+    respondeco = Column(String(255, 'utf8_bin'))
     idAsocio = Column(Integer)
     idUrbo = Column(Integer)
     idFako = Column(Integer)
-    observoj = Column(String(255, 'utf8_unicode_ci'))
+    idAneckotizo = Column(Integer)
+    observoj = Column(String(255, 'utf8_bin'))
+    aprobita = Column(Integer)
 
 
 class Asocio(Base):
     __tablename__ = 'asocio'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    siglo = Column(String(255, 'utf8_unicode_ci'))
-    adreso = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
+    siglo = Column(String(255, 'utf8_bin'))
+    adreso = Column(String(255, 'utf8_bin'))
     fondigxdato = Column(Date)
-    posxtkodo = Column(String(255, 'utf8_unicode_ci'))
-    urbo = Column(Integer)
-    fako = Column(Integer)
-    lando = Column(String(255, 'utf8_unicode_ci'))
-    telhejmo = Column(String(255, 'utf8_unicode_ci'))
-    retposxto = Column(String(255, 'utf8_unicode_ci'))
-    delegFako = Column(String(255, 'utf8_unicode_ci'))
-    tttpagxo = Column(String(255, 'utf8_unicode_ci'))
+    posxtkodo = Column(String(255, 'utf8_bin'))
+    idUrbo = Column(Integer)
+    idFako = Column(Integer)
+    lando = Column(String(255, 'utf8_bin'))
+    telhejmo = Column(String(255, 'utf8_bin'))
+    retposxto = Column(String(255, 'utf8_bin'))
+    delegFako = Column(String(255, 'utf8_bin'))
+    tttpagxo = Column(String(255, 'utf8_bin'))
     junulara = Column(Integer)
     faka = Column(Integer)
     landa = Column(Integer)
-    abc = Column(String(255, 'utf8_unicode_ci'))
+    abc = Column(String(255, 'utf8_bin'))
 
 
 class AsocioSangxpropono(Base):
@@ -90,18 +90,18 @@ class AsocioSangxpropono(Base):
 
     id = Column(Integer, primary_key=True)
     idAsocio = Column(Integer)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    siglo = Column(String(255, 'utf8_unicode_ci'))
-    adreso = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
+    siglo = Column(String(255, 'utf8_bin'))
+    adreso = Column(String(255, 'utf8_bin'))
     fondigxdato = Column(Date)
-    posxtkodo = Column(String(255, 'utf8_unicode_ci'))
-    urbo = Column(Integer)
-    telhejmo = Column(String(255, 'utf8_unicode_ci'))
-    landokodo = Column(String(255, 'utf8_unicode_ci'))
-    retposxto = Column(String(255, 'utf8_unicode_ci'))
-    delegFako = Column(String(255, 'utf8_unicode_ci'))
-    tttpagxo = Column(String(255, 'utf8_unicode_ci'))
-    abc = Column(String(255, 'utf8_unicode_ci'))
+    posxtkodo = Column(String(255, 'utf8_bin'))
+    idUrbo = Column(Integer)
+    telhejmo = Column(String(255, 'utf8_bin'))
+    landokodo = Column(String(255, 'utf8_bin'))
+    retposxto = Column(String(255, 'utf8_bin'))
+    delegFako = Column(String(255, 'utf8_bin'))
+    tttpagxo = Column(String(255, 'utf8_bin'))
+    abc = Column(String(255, 'utf8_bin'))
 
 
 class Dissendo(Base):
@@ -109,10 +109,10 @@ class Dissendo(Base):
 
     id = Column(Integer, primary_key=True)
     dissendanto = Column(Integer)
-    nomede = Column(String(255, 'utf8_unicode_ci'))
+    nomede = Column(String(255, 'utf8_bin'))
     dato = Column(Date)
-    temo = Column(String(255, 'utf8_unicode_ci'))
-    teksto = Column(String(255, 'utf8_unicode_ci'))
+    temo = Column(String(255, 'utf8_bin'))
+    teksto = Column(String(255, 'utf8_bin'))
 
 
 class DissendoDemandero(Base):
@@ -121,30 +121,31 @@ class DissendoDemandero(Base):
     id = Column(Integer, primary_key=True)
     idDissendo = Column(Integer)
     demNum = Column(Integer)
-    demTeksto = Column(String(255, 'utf8_unicode_ci'))
+    demTeksto = Column(String(255, 'utf8_bin'))
 
 
 class Faktemo(Base):
     __tablename__ = 'faktemo'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(1600, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(1600, 'utf8_bin'))
 
 
 class GrupaKategorio(Base):
     __tablename__ = 'grupa_kategorio'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
 
 
 class Grupo(Base):
     __tablename__ = 'grupo'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    mallongigilo = Column(String(255, 'utf8_bin'))
+    nomo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
     idAsocio = Column(Integer)
 
 
@@ -154,7 +155,7 @@ class GxenSpezraportero(Base):
     id = Column(Integer, primary_key=True)
     idGxenSpezraporto = Column(Integer)
     enspezo = Column(Integer)
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    priskribo = Column(String(255, 'utf8_bin'))
     sumo = Column(Integer)
 
 
@@ -164,8 +165,8 @@ class GxenSpezraporto(Base):
     id = Column(Integer, primary_key=True)
     dato = Column(Date)
     idPeranto = Column(Integer)
-    valuto = Column(String(255, 'utf8_unicode_ci'))
-    noto = Column(String(255, 'utf8_unicode_ci'))
+    valuto = Column(String(255, 'utf8_bin'))
+    noto = Column(String(255, 'utf8_bin'))
     validita = Column(Integer)
     printita = Column(Integer)
 
@@ -176,7 +177,7 @@ class GxenSpezraportoKotizo(Base):
     id = Column(Integer, primary_key=True)
     idGxenSpezraporto = Column(Integer)
     idUzanto = Column(Integer)
-    nomoUzanto = Column(String(255, 'utf8_unicode_ci'))
+    nomoUzanto = Column(String(255, 'utf8_bin'))
     idAnoGrupo = Column(Integer)
 
 
@@ -186,8 +187,8 @@ class Gxirpropono(Base):
     id = Column(Integer, primary_key=True)
     idGxiranto = Column(Integer)
     idRicevanto = Column(Integer)
-    konto = Column(String(255, 'utf8_unicode_ci'))
-    kialo = Column(String(1600, 'utf8_unicode_ci'))
+    konto = Column(String(255, 'utf8_bin'))
+    kialo = Column(String(1600, 'utf8_bin'))
 
 
 class KongresaAligxinto(Base):
@@ -197,14 +198,28 @@ class KongresaAligxinto(Base):
     kongresaNumero = Column(Integer)
     idUzanto = Column(Integer)
     idAligxkotizo = Column(Integer)
+    pagita = Column(Integer)
     idKongreso = Column(Integer)
+
+
+class KongresaAligxkotizo(Base):
+    __tablename__ = 'kongresa_aligxkotizo'
+
+    id = Column(Integer, primary_key=True)
+    idKongreso = Column(Integer)
+    prezo = Column(Integer)
+    gxis_naskigxjaro = Column(Date)
+    landKategorio = Column(Integer)
+    grupo = Column(Integer)
+    aligxperiodo = Column(Integer)
+    priskribo = Column(String(1600, 'utf8_bin'))
 
 
 class KongresaDormcxambro(Base):
     __tablename__ = 'kongresa_dormcxambro'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
     logxejo = Column(Integer)
     id_dormcxambrsxablono = Column(Integer)
 
@@ -216,7 +231,7 @@ class KongresaDormcxambrsxablono(Base):
     litKvanto = Column(Integer)
     personKvanto = Column(Integer)
     prezo = Column(Integer)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
 
 
 class KongresaEkskurso(Base):
@@ -224,8 +239,8 @@ class KongresaEkskurso(Base):
 
     id = Column(Integer, primary_key=True)
     idKongreso = Column(Integer)
-    titolo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    titolo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
     dato = Column(Date)
     prezo = Column(Integer)
     kvanto = Column(Integer)
@@ -238,14 +253,14 @@ class KongresaLogxejo(Base):
     kongreso = Column(Integer)
     ordig = Column(Integer)
     rango = Column(Integer)
-    adreso = Column(String(255, 'utf8_unicode_ci'))
-    foreco = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
-    retejo = Column(String(255, 'utf8_unicode_ci'))
-    retadreso = Column(String(255, 'utf8_unicode_ci'))
-    telefono = Column(String(255, 'utf8_unicode_ci'))
-    fakso = Column(String(255, 'utf8_unicode_ci'))
-    notoj = Column(String(255, 'utf8_unicode_ci'))
+    adreso = Column(String(255, 'utf8_bin'))
+    foreco = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
+    retejo = Column(String(255, 'utf8_bin'))
+    retadreso = Column(String(255, 'utf8_bin'))
+    telefono = Column(String(255, 'utf8_bin'))
+    fakso = Column(String(255, 'utf8_bin'))
+    notoj = Column(String(255, 'utf8_bin'))
 
 
 class KongresaProgramejo(Base):
@@ -253,8 +268,8 @@ class KongresaProgramejo(Base):
 
     id = Column(Integer, primary_key=True)
     idKongreso = Column(Integer)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
 
 
 class KongresaProgramo(Base):
@@ -264,9 +279,26 @@ class KongresaProgramo(Base):
     idKongreso = Column(Integer)
     komenctempo = Column(Date)
     fintempo = Column(Date)
-    evento = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(1600, 'utf8_unicode_ci'))
-    programejo = Column(Integer)
+    evento = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(1600, 'utf8_bin'))
+    idKategorio = Column(Integer)
+    idProgramejo = Column(Integer)
+
+
+class KongresaProgramoKategorio(Base):
+    __tablename__ = 'kongresa_programo_kategorio'
+
+    id = Column(Integer, primary_key=True)
+    titolo = Column(String(255, 'utf8_bin'))
+
+
+class KongresaServo(Base):
+    __tablename__ = 'kongresa_servo'
+
+    id = Column(Integer, primary_key=True)
+    nomo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
+    prezo = Column(Integer)
 
 
 class KongresaSpezraportero(Base):
@@ -275,7 +307,7 @@ class KongresaSpezraportero(Base):
     id = Column(Integer, primary_key=True)
     idKongresaSpezraporto = Column(Integer)
     idUzanto = Column(Integer)
-    nomoUzanto = Column(String(255, 'utf8_unicode_ci'))
+    nomoUzanto = Column(String(255, 'utf8_bin'))
     kongresaKotizo = Column(Integer)
     kongresajMendoj = Column(Integer)
 
@@ -286,8 +318,8 @@ class KongresaSpezraporto(Base):
     id = Column(Integer, primary_key=True)
     dato = Column(Date)
     idPeranto = Column(Integer)
-    valuto = Column(String(255, 'utf8_unicode_ci'))
-    noto = Column(String(255, 'utf8_unicode_ci'))
+    valuto = Column(String(255, 'utf8_bin'))
+    noto = Column(String(255, 'utf8_bin'))
     validita = Column(Integer)
     printia = Column(Integer)
 
@@ -296,13 +328,14 @@ class Kongreso(Base):
     __tablename__ = 'kongreso'
 
     id = Column(Integer, primary_key=True)
-    titolo = Column(String(255, 'utf8_unicode_ci'))
+    titolo = Column(String(255, 'utf8_bin'))
+    bildo = Column(String(255, 'utf8_bin'))
     idUrbo = Column(Integer)
     jaro = Column(Date)
     numero = Column(Integer)
     komencdato = Column(Date)
-    temo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    temo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
     findato = Column(Date)
 
 
@@ -310,7 +343,7 @@ class KsPagKampo(Base):
     __tablename__ = 'ks_pag_kampo'
 
     id = Column(Integer, primary_key=True)
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    priskribo = Column(String(255, 'utf8_bin'))
     defauxltaValuto = Column(Integer, server_default=text("'0'"))
 
 
@@ -318,25 +351,25 @@ class LandKategorio(Base):
     __tablename__ = 'landKategorio'
 
     id = Column(Integer, primary_key=True)
-    titolo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(1500, 'utf8_unicode_ci'))
+    titolo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(1500, 'utf8_bin'))
 
 
 class Lando(Base):
     __tablename__ = 'lando'
 
     id = Column(Integer, primary_key=True)
-    nomoLoka = Column(String(255, 'utf8_unicode_ci'))
-    radikoEo = Column(String(255, 'utf8_unicode_ci'))
-    finajxoEo = Column(String(255, 'utf8_unicode_ci'))
-    landkodo = Column(String(255, 'utf8_unicode_ci'))
+    nomoLoka = Column(String(255, 'utf8_bin'))
+    radikoEo = Column(String(255, 'utf8_bin'))
+    finajxoEo = Column(String(255, 'utf8_bin'))
+    landkodo = Column(String(255, 'utf8_bin'))
 
 
 class Opcio(Base):
     __tablename__ = 'opcio'
 
     id = Column(Integer, primary_key=True)
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    priskribo = Column(String(255, 'utf8_bin'))
     idVocxdonado = Column(Integer)
 
 
@@ -369,7 +402,7 @@ t_ref_aligxinto_logxejo = Table(
     Column('alvendato', Date),
     Column('forirdato', Date),
     Column('kvanto', Integer),
-    Column('kunkogxantoj', String(255, 'utf8_unicode_ci')),
+    Column('kunkogxantoj', String(255, 'utf8_bin')),
     Index('idAligxinto', 'idAligxinto', 'idDormcxambro', unique=True)
 )
 
@@ -402,6 +435,14 @@ class RefKongresaEkskursoMendo(Base):
     idKEkskurso = Column(Integer, primary_key=True, nullable=False)
 
 
+t_ref_kongresa_servo_aligxinto = Table(
+    'ref_kongresa_servo_aligxinto', metadata,
+    Column('idAligxinto', Integer),
+    Column('idServo', Integer),
+    Column('pagita', Integer)
+)
+
+
 class RefKongresaSpezraporteroKsPagKampo(Base):
     __tablename__ = 'ref_kongresa_spezraportero_ks_pag_kampo'
 
@@ -413,8 +454,8 @@ class RefKongresaSpezraporteroKsPagKampo(Base):
 class RefKongresoKromaKongreso(Base):
     __tablename__ = 'ref_kongreso_kroma_kongreso'
 
-    id_cxefa_kongreso = Column(Integer, primary_key=True, nullable=False)
-    id_kroma_kongreso = Column(Integer, primary_key=True, nullable=False)
+    idCxefaKongreso = Column(Integer, primary_key=True, nullable=False)
+    idKromaKongreso = Column(Integer, primary_key=True, nullable=False)
 
 
 class RefLandoLandKategorio(Base):
@@ -429,8 +470,15 @@ class RefTekoGrupo(Base):
 
     id = Column(Integer, primary_key=True)
     idTeko = Column(Integer)
-    idgrupo = Column(Integer)
+    idGrupo = Column(Integer)
     jaro = Column(Integer)
+
+
+class RefTekoKategorio(Base):
+    __tablename__ = 'ref_teko_kategorio'
+
+    idKategorio = Column(Integer, primary_key=True, nullable=False)
+    idTeko = Column(Integer, primary_key=True, nullable=False)
 
 
 class RetlistAbono(Base):
@@ -439,40 +487,47 @@ class RetlistAbono(Base):
     id = Column(Integer, primary_key=True)
     ekde = Column(Date)
     abono = Column(Integer)
-    id_uzanto = Column(Integer)
+    idUzanto = Column(Integer)
     formato_html = Column(Integer)
     kodigxo_utf8 = Column(Integer)
-    retadreso = Column(String(255, 'utf8_unicode_ci'))
+    retadreso = Column(String(255, 'utf8_bin'))
 
 
 class Retlisto(Base):
     __tablename__ = 'retlisto'
 
     id = Column(Integer, primary_key=True)
-    nomo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(255, 'utf8_unicode_ci'))
+    nomo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(255, 'utf8_bin'))
 
 
 class Sxangxhistorio(Base):
     __tablename__ = 'sxangxhistorio'
 
     id = Column(Integer, primary_key=True)
-    tabelo = Column(String(255, 'utf8_unicode_ci'))
-    kampo = Column(String(255, 'utf8_unicode_ci'))
-    antauxa_valoro = Column(String(255, 'utf8_unicode_ci'))
+    tabelo = Column(String(255, 'utf8_bin'))
+    kampo = Column(String(255, 'utf8_bin'))
+    antauxa_valoro = Column(String(255, 'utf8_bin'))
     farita_de = Column(Integer)
     dato = Column(Date)
+
+
+class TekaKategorio(Base):
+    __tablename__ = 'teka_kategorio'
+
+    id = Column(Integer, primary_key=True)
+    titolo = Column(String(255, 'utf8_bin'))
 
 
 class Teko(Base):
     __tablename__ = 'teko'
 
     id = Column(Integer, primary_key=True)
-    titolo = Column(String(255, 'utf8_unicode_ci'))
-    elnomo = Column(String(255, 'utf8_unicode_ci'))
-    kodnomo = Column(String(255, 'utf8_unicode_ci'))
+    titolo = Column(String(255, 'utf8_bin'))
+    elnomo = Column(String(255, 'utf8_bin'))
+    kodnomo = Column(String(255, 'utf8_bin'))
     jaro = Column(Integer)
-    absnum = Column(String(255, 'utf8_unicode_ci'))
+    absnum = Column(String(255, 'utf8_bin'))
     vido = Column(Integer)
 
 
@@ -480,9 +535,9 @@ class Urbo(Base):
     __tablename__ = 'urbo'
 
     id = Column(Integer, primary_key=True)
-    nomoLoka = Column(String(255, 'utf8_unicode_ci'))
-    nomoEo = Column(String(255, 'utf8_unicode_ci'))
-    provinco= Column(String(255, 'utf8_unicode_ci'))
+    nomoLoka = Column(String(255, 'utf8_bin'))
+    nomoEo = Column(String(255, 'utf8_bin'))
+    provinco = Column(String(255, 'utf8_bin'))
     idLando = Column(Integer)
 
 
@@ -490,40 +545,42 @@ class Uzanto(Base):
     __tablename__ = 'uzanto'
 
     id = Column(Integer, primary_key=True)
-    personanomo = Column(String(255, 'utf8_unicode_ci'))
-    familianomo = Column(String(255, 'utf8_unicode_ci'))
-    titolo = Column(String(255, 'utf8_unicode_ci'))
-    bildo = Column(String(255, 'utf8_unicode_ci'))
-    personanomoIdentigilo = Column(String(255, 'utf8_unicode_ci'))
-    familianomoIdentigilo = Column(String(255, 'utf8_unicode_ci'))
-    adreso = Column(String(255, 'utf8_unicode_ci'))
-    posxtkodo = Column(String(255, 'utf8_unicode_ci'))
-    logxurbo = Column(Integer)
-    nacialando = Column(Integer)
+    personanomo = Column(String(255, 'utf8_bin'))
+    familianomo = Column(String(255, 'utf8_bin'))
+    titolo = Column(String(255, 'utf8_bin'))
+    bildo = Column(String(255, 'utf8_bin'))
+    personanomoIdentigilo = Column(String(255, 'utf8_bin'))
+    familianomoIdentigilo = Column(String(255, 'utf8_bin'))
+    adreso = Column(String(255, 'utf8_bin'))
+    posxtkodo = Column(String(255, 'utf8_bin'))
+    idLogxurbo = Column(Integer)
+    idlando = Column(Integer)
     naskigxtago = Column(Date)
+    morta = Column(Integer)
     mortdatekscio = Column(Date)
     mortdato = Column(Date)
-    notoj = Column(String(255, 'utf8_unicode_ci'))
-    profesio = Column(String(255, 'utf8_unicode_ci'))
-    retposxto = Column(String(255, 'utf8_unicode_ci'))
-    telhejmo = Column(String(255, 'utf8_unicode_ci'))
-    teloficejo = Column(String(255, 'utf8_unicode_ci'))
-    telportebla = Column(String(255, 'utf8_unicode_ci'))
+    notoj = Column(String(255, 'utf8_bin'))
+    profesio = Column(String(255, 'utf8_bin'))
+    retposxto = Column(String(255, 'utf8_bin'))
+    telhejmo = Column(String(255, 'utf8_bin'))
+    teloficejo = Column(String(255, 'utf8_bin'))
+    telportebla = Column(String(255, 'utf8_bin'))
     kerekzameno = Column(Integer)
-    kernivelo = Column(String(2, 'utf8_unicode_ci'))
+    kernivelo = Column(String(2, 'utf8_bin'))
     kerdato = Column(Date)
-    tttpagxo = Column(String(255, 'utf8_unicode_ci'))
+    tttpagxo = Column(String(255, 'utf8_bin'))
     validaKonto = Column(Integer)
-    abc = Column(String(255, 'utf8_unicode_ci'))
+    abc = Column(String(255, 'utf8_bin'))
 
 
 class UzantoAuxAsocio(Base):
     __tablename__ = 'uzantoAuxAsocio'
 
     id = Column(Integer, primary_key=True)
-    ueakodo = Column(String(255, 'utf8_unicode_ci'))
-    uzantnomo = Column(String(255, 'utf8_unicode_ci'))
-    pasvorto = Column(Text(collation='utf8_unicode_ci'))
+    ueakodo = Column(String(255, 'utf8_bin'), unique=True)
+    uzantnomo = Column(String(255, 'utf8_bin'), unique=True)
+    pasvortoHash = Column(Text(collation='utf8_bin'))
+    pasvortoSalt = Column(Text(collation='utf8_bin'))
 
 
 class UzantoSangxpropono(Base):
@@ -531,34 +588,34 @@ class UzantoSangxpropono(Base):
 
     id = Column(Integer, primary_key=True)
     idUzanto = Column(Integer)
-    personanomo = Column(String(255, 'utf8_unicode_ci'))
-    familianomo = Column(String(255, 'utf8_unicode_ci'))
-    personanomoIdentigilo = Column(String(255, 'utf8_unicode_ci'))
-    familianomoIdentigilo = Column(String(255, 'utf8_unicode_ci'))
-    adreso = Column(String(255, 'utf8_unicode_ci'))
-    posxtkodo = Column(String(255, 'utf8_unicode_ci'))
-    logxurbo = Column(Integer)
-    nacialando = Column(Integer)
+    personanomo = Column(String(255, 'utf8_bin'))
+    familianomo = Column(String(255, 'utf8_bin'))
+    personanomoIdentigilo = Column(String(255, 'utf8_bin'))
+    familianomoIdentigilo = Column(String(255, 'utf8_bin'))
+    adreso = Column(String(255, 'utf8_bin'))
+    posxtkodo = Column(String(255, 'utf8_bin'))
+    idLogxurbo = Column(Integer)
+    idNacialando = Column(Integer)
     naskigxtago = Column(Date)
     mortdatekscio = Column(Date)
     mortdato = Column(Date)
-    notoj = Column(String(255, 'utf8_unicode_ci'))
-    profesio = Column(String(255, 'utf8_unicode_ci'))
-    retposxto = Column(String(255, 'utf8_unicode_ci'))
-    telhejmo = Column(String(255, 'utf8_unicode_ci'))
-    teloficejo = Column(String(255, 'utf8_unicode_ci'))
-    telportebla = Column(String(255, 'utf8_unicode_ci'))
-    tttpagxo = Column(String(255, 'utf8_unicode_ci'))
+    notoj = Column(String(255, 'utf8_bin'))
+    profesio = Column(String(255, 'utf8_bin'))
+    retposxto = Column(String(255, 'utf8_bin'))
+    telhejmo = Column(String(255, 'utf8_bin'))
+    teloficejo = Column(String(255, 'utf8_bin'))
+    telportebla = Column(String(255, 'utf8_bin'))
+    tttpagxo = Column(String(255, 'utf8_bin'))
     validakonto = Column(Integer)
-    abc = Column(String(255, 'utf8_unicode_ci'))
+    abc = Column(String(255, 'utf8_bin'))
 
 
 class Vocxdonado(Base):
     __tablename__ = 'vocxdonado'
 
     id = Column(Integer, primary_key=True)
-    titolo = Column(String(255, 'utf8_unicode_ci'))
-    priskribo = Column(String(1600, 'utf8_unicode_ci'))
+    titolo = Column(String(255, 'utf8_bin'))
+    priskribo = Column(String(1600, 'utf8_bin'))
     pluraj_opcioj = Column(Integer)
     anonima = Column(Integer)
     aperdato = Column(Date)
