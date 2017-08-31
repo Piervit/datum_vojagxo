@@ -16,11 +16,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import create_session
 
 import transir_grupoj
+import transir_uk
+
 from TabelTransiro import TabelTransiro
 
 ################
 # ueadb module was generated using
-# sqlacodegen postgresql://postgres:kukurbeto@127.0.0.1/ueadb > ueadb.py
+# sqlacodegen postgresql://postgres:kukurbeto@127.0.0.1/ueadb_11072017 > ueadb.py
 #
 ###############
 import ueadb
@@ -78,7 +80,7 @@ class NeValidaUeaKodo(TransirError):
 
 Base = declarative_base()
 #Connect to the old ueadb
-engine_ueadb = create_engine('postgresql://postgres:kukurbeto@127.0.0.1:5432/ueadb')
+engine_ueadb = create_engine('postgresql://postgres:kukurbeto@127.0.0.1:5432/ueadb_11072017')
 #Create a session to use the tables    
 session_ueadb = create_session(bind=engine_ueadb)
 
@@ -136,11 +138,11 @@ def valid_ueakodo(ueakodo):
         raise NeValidaUeaKodo
 
 
-date_pattern = re.compile('([0-9]{4})'+sep+'([0-9]{2})'+sep+'([0-9]{2})')
+date_pattern = re.compile('([0-9]{4})\/([0-9]{2})\/([0-9]{2})')
 def karakteroj_al_dato(karakteroj):
+    global date_pattern
     if karakteroj is None:
         return None
-    sep = "\/"
     res = date_pattern.match(karakteroj)
     if res is None:
         print("Ne povis krei daton "+karakteroj)
@@ -182,6 +184,8 @@ class TabelTransirLando(TabelTransiro):
             self.add(novlando.landkodo, novlando)
 
     def get_id(self, landkodo):
+        if type(landkodo) is bytes:
+            landkodo = str(landkodo)
         if landkodo == "nev":
             raise NeValidaLando("nev")
         if landkodo == "mrt":
@@ -227,6 +231,9 @@ class TabelTransirUrbo(TabelTransiro):
                     nunaUrbo.idlando = self.transir_lando.get_id(ulandokodo)
                 except (NeValidaLando, NeDevusEstiNone, MalplenaError): 
                     nunaUrbo.idLando = None
+            print("create type :"+str(type(unomo)))
+            print("create val :"+str((unomo)))
+
             self.add(unomo, nunaUrbo)
             return
         try:
@@ -237,6 +244,8 @@ class TabelTransirUrbo(TabelTransiro):
                     provinco=uProvinco, 
                     idLando=idlando
                     )
+            print("create type :"+str(type(unomo)))
+            print("create val :"+str((unomo)))
             self.add(unomo, novurbo)
         except (MalplenaError, NeValidaLando, NeDevusEstiNone):
            if unomo is not None and ulandokodo is None:
@@ -247,6 +256,8 @@ class TabelTransirUrbo(TabelTransiro):
                     provinco=uProvinco, 
                     idLando=None
                     )
+               print("create type :"+str(type(unomo)))
+               print("create val :"+str((unomo)))
                self.add(unomo, novurbo)
            elif unomo is not None:
                 print("Ne povis ligi "+str(unomo)+" al lando (landokodo "+str(ulandokodo)+" ne valida)")
@@ -254,8 +265,12 @@ class TabelTransirUrbo(TabelTransiro):
                print("Urbo ne havas nomon: ne-konsiderita.")
 
     def get_id(self, urbonomo):
+        if type(urbonomo) is str:
+            urbonomo = bytes(urbonomo, 'utf8')
         res = self.trovi(urbonomo)
         if(res is None):
+            print ("get urbo: ne trovita "+str(type(urbonomo)))
+            print ("get urbo: ne trovita "+str(urbonomo))
             raise MalplenaError("get urbo: ne trovita "+str(urbonomo))
         else :
             return res.id
@@ -449,7 +464,9 @@ class TabelTransirAsocio(TabelTransiro):
             asocia_nomo = asocio.familianomo
             if(asocia_nomo is None):
                 asocia_nomo = asocio.personanomo
-            try :
+            try : 
+                print("use type :"+str(type(asocio.urbo)))
+                print("use val :"+str((asocio.urbo)))
                 idurbo = self.transir_urbo.get_id(asocio.urbo)
             except (NeUnikaError, MalplenaError) :
                 if asocio.urbo is None:
@@ -594,6 +611,7 @@ def get_id_uzanto_aux_asocio(familianomo, personanomo, transir_asocio, transir_u
         return res.id
 
 def get_id_uzanto_aux_asocio_from_ueakodo(ueakodo, transir_asocioAuxUzanto):
+    print("ueakodo: "+ueakodo)
     res=transir_asocioAuxUzanto.trovi(ueakodo)
     if(res is None):
         raise MalplenaError("uzanto ne trovita: "+ueakodo)
@@ -725,24 +743,48 @@ class TabelTransirDissendo(TabelTransiro):
         TabelTransiro.__init__(self)
 
     def get_ueakodo_from_retuzanto(self, session_ueamsql, uznomo):
-        uzanto = session_ueamsql.query(ueamsql.Uzantoj).filter(ueamsql.Uzantoj.uznomo == uznomo)
-        return uzanto.kodo
+        print("uznomo: "+uznomo)
+        if (uznomo == "manuela"):
+            return "ronc"
+        elif (uznomo == "osmo"):
+            return "osmo"
+        elif (uznomo == "maritza"):
+            return "itza"
+        elif (uznomo == "james"):
+            return "jrpi"
+        elif (uznomo == "rocxjo"):
+            return "uurm"
+        elif (uznomo == "fiskot"):
+            return "pfko"
+        elif (uznomo == "mevamevo"):
+            return "mevc"
+        elif (uznomo == "Roxane"):
+            return "rfrn"
+        else:
+            uzanto = session_ueamsql.query(ueamsql.Uzantoj).filter(ueamsql.Uzantoj.uznomo == uznomo).first()
+            if uzanto is None:
+                print ("Ne Valida uzanto: "+uznomo)
+                raise NeValidaUeaKodo
+            return uzanto.kodo
 
-
-    def konverti(self, session_ueamsql):
+    def konverti(self, session_ueamsql, transir_asocioAuxUzanto):
         dissendolist = session_ueamsql.query(ueamsql.Dissendoj).all()
         for dissendo in dissendolist:
-            novdissendo = novuea.Dissendo (
-                id= dissendo.id,
-                dissendanto = get_id_uzanto_aux_asocio_from_ueakodo(
-                    self.get_ueakodo_from_retuzanto(session_ueamsql, dissendo.nomo)
-                    ),
-                nomede = dissendo.nomede, 
-                dato = dissendo.kiam,
-                temo = dissendo.temo,
-                teksto = dissendo.teksto
-                )
-            self.add(id, novdissendo)
+            try:
+                novdissendo = novuea.Dissendo (
+                    id= dissendo.id,
+                    dissendanto = get_id_uzanto_aux_asocio_from_ueakodo(
+                        self.get_ueakodo_from_retuzanto(session_ueamsql, dissendo.nomo),
+                        transir_asocioAuxUzanto
+                        ),
+                    nomede = dissendo.nomede, 
+                    dato = dissendo.kiam,
+                    temo = dissendo.temo,
+                    teksto = dissendo.teksto
+                    )
+                self.add(dissendo.id, novdissendo)
+            except NeValidaUeaKodo:
+                print ("ne povis aldono dissendo pro nevalida nomo de dissendanto: " + dissendo.nomo)
  
 class TabelTransirDissendoDemanderoj(TabelTransiro):
 
@@ -752,13 +794,13 @@ class TabelTransirDissendoDemanderoj(TabelTransiro):
     def konverti(self, session_ueamsql):
         demanderojlist = session_ueamsql.query(ueamsql.DissendojEnketoj).all()
         for demandero in demanderojlist:
-            novdemandero = novuea.DissendojEnketoj (
+            novdemandero = novuea.DissendoDemandero(
                 id= demandero.id,
                 idDissendo = demandero.dissendo,
                 demNum = demandero.dem_num,
                 demTeksto = demandero.dem_teksto
                 )
-            self.add(id, ovdemandero)
+            self.add(id, novdemandero)
  
  
 class TabelTransirDissendoRespondoj(TabelTransiro):
@@ -766,12 +808,22 @@ class TabelTransirDissendoRespondoj(TabelTransiro):
     def __init__(self):
         TabelTransiro.__init__(self)
 
-    def konverti(self, session_ueamsql):
+    def konverti(self, session_ueamsql, transir_asocio, transir_uzanto):
         respondojlist = session_ueamsql.query(ueamsql.DissendojRespondoj).all()
         for respondo in respondojlist:
-            novrespondo = novuea.RefDissendoRespondoj(
+            retposxto = None
+            idUzantoAuxAsocio = None
+            try:
                 idUzantoAuxAsocio = get_id_uzanto_aux_asocio_from_retadreso(
-                    respondo.retposxto),
+                    respondo.retposxto,
+                    transir_asocio,
+                    transir_uzanto)
+            except MalplenaError:
+                retposxto = respondo.retposxto
+                idUzantoAuxAsocio= None
+            novrespondo = novuea.RefDissendoRespondoj(
+                idUzantoAuxAsocio = idUzantoAuxAsocio,
+                retposxto = retposxto,
                 idDissendoDemandero = respondo.enketo
                 )
             self.add(i, novrespondo)
@@ -801,6 +853,7 @@ class TabelTransirRetlistoAbono(TabelTransiro):
         TabelTransiro.__init__(self)
 
     def konverti(self, session_retdb, transir_retlisto):
+        list= session_retdb.query(retdb.t_abonoj).add_column("abono").distinct()
         retlistolist= session_retdb.query(retdb.t_abonoj).add_column("abono").distinct()
         i = 0
         for retlisto in retlistolist:
@@ -815,7 +868,66 @@ class TabelTransirRetlistoAbono(TabelTransiro):
                 )
             self.add(i, novretlisto)
             i = i+1
-    
+ 
+class TabelTransirKongreso (TabelTransiro):
+ 
+    def __init__(self):
+        TabelTransiro.__init__(self)
+
+    def konverti(self, transir_urbo):
+        kongreso_kat_uk = novuea.KongresaKategorio(
+                    id = 1,
+                    nomo = "UK"
+                )
+        self.add("UK", kongreso_kat_uk)
+        kongresolist = transir_uk.get_ukj()
+        id_kongreso = 0
+        for kongreso in retlistolist:
+            novkongreso = novuea.Kongreso(
+                id = id_kongreso,
+                titolo= kongreso.titolo,
+                bildo = "",
+                idUrbo = transir_urbo.get_id(kongreso.urbo),
+                jaro = kongreso.jaro,
+                numero = kongreso.numero ,
+                komencdato= NULL,
+                temo = kongreso.temo,
+                priskribo = "",
+                aligxinto= kongreso.aligxinto,
+                findato = NULL
+                )
+            ref_kongreso_kat_kongreso = novuea.RefKongresaKategorioKongreso(
+                    idKongresaKategorio = 1,
+                    idKongreso= id_kongreso
+                    )
+            id_kongreso = id_kongreso +1
+            self.add(kongreso.jaro, novkongreso)
+ 
+#class TabelTransirAntauxPostKongreso (TabelTransiro):
+# 
+#    def __init__(self):
+#        TabelTransiro.__init__(self)
+#
+#    def konverti(self, transir_urbo):
+#        akpklist= session_ueamsql.query(ueamsql.t_akpk).all()
+#        for akpk in akpklist:
+#            novkongreso = novuea.Kongreso(
+#                titolo= akpk.titolo,
+#                bildo = "",
+#                idUrbo = ,
+#                jaro = kongreso.jaro,
+#                numero = ,
+#                komencdato= NULL,
+#                temo = kongreso.temo,
+#                priskribo = "",
+#                aligxinto= kongreso.aligxinto,
+#                findato = NULL
+#                )
+#            self.add(kongreso.jaro, novkongreso)
+ 
+
+
+
 ###################  FINO RILATE AL DISENDO ########################
 
 
@@ -854,27 +966,27 @@ konv_faktemon.commit(session_novuea)
 post_faktemo= time.clock()
 print("time post faktemo: "+ str(post_faktemo - post_urbo))
 
-konv_kategorion = TabelTransirKategorio()
-konv_kategorion.konverti(get_grupkategorioj())
-konv_kategorion.commit(session_novuea)
-
-post_kategorio= time.clock()
-print("time post kategorio: "+ str(post_kategorio - post_faktemo))
-
+#konv_kategorion = TabelTransirKategorio()
+#konv_kategorion.konverti(get_grupkategorioj())
+#konv_kategorion.commit(session_novuea)
+#
+#post_kategorio= time.clock()
+#print("time post kategorio: "+ str(post_kategorio - post_faktemo))
+#
 konv_grupon = TabelTransirGrupo()
 konv_grupon.konverti(get_grupojn())
 konv_grupon.commit(session_novuea)
 
 post_grupo= time.clock()
-print("time post grupo: "+ str(post_grupo - post_kategorio))
+#print("time post grupo: "+ str(post_grupo - post_kategorio))
 
 
-konv_grupon_kat = TabelTransirGrupo_Kategorio()
-konv_grupon_kat.konverti(get_grupojn(), konv_grupon, konv_kategorion)
-konv_grupon_kat.commit(session_novuea)
-
-post_grupo_kat= time.clock()
-print("time post grupo_kat: "+ str(post_grupo_kat - post_grupo))
+#konv_grupon_kat = TabelTransirGrupo_Kategorio()
+#konv_grupon_kat.konverti(get_grupojn(), konv_grupon, konv_kategorion)
+#konv_grupon_kat.commit(session_novuea)
+#
+#post_grupo_kat= time.clock()
+#print("time post grupo_kat: "+ str(post_grupo_kat - post_grupo))
 
 konv_asocionAuxUzanto = TabelTransiro()
 
@@ -883,7 +995,7 @@ konv_asocion.konverti(session_ueadb, )
 konv_asocion.commit(session_novuea)
 
 post_asocio= time.clock()
-print("time post asocio: "+ str(post_asocio - post_grupo_kat))
+#print("time post asocio: "+ str(post_asocio - post_grupo_kat))
 
 konv_uzanton = TabelTransirUzanto(konv_landon, konv_urbon, konv_asocionAuxUzanto)
 konv_uzanton.konverti(session_ueadb)
@@ -894,23 +1006,41 @@ post_uzanto= time.clock()
 print("time post uzanto: "+ str(post_uzanto - post_asocio))
 
 
-konv_peranto = TabelTransirPeranto(konv_asocion, konv_uzanton, konv_landon)
-konv_peranto.konverti(session_ueadb)
-konv_peranto.commit(session_novuea)
+#konv_peranto = TabelTransirPeranto(konv_asocion, konv_uzanton, konv_landon)
+#konv_peranto.konverti(session_ueadb)
+#konv_peranto.commit(session_novuea)
+#
+#post_peranto= time.clock()
+#print("time post peranto: "+ str(post_peranto - post_asocio))
 
-post_peranto= time.clock()
-print("time post peranto: "+ str(post_peranto - post_asocio))
-
-konv_aneco = TabelTransirAneco()
-konv_aneco.konverti(session_ueadb, konv_grupon, konv_asocion, konv_uzanton)
-konv_aneco.commit(session_novuea)
-
-post_aneco= time.clock()
-print("time post aneco: "+ str(post_aneco - post_peranto))
+#konv_aneco = TabelTransirAneco()
+#konv_aneco.konverti(session_ueadb, konv_grupon, konv_asocion, konv_uzanton)
+#konv_aneco.commit(session_novuea)
+#
+#post_aneco= time.clock()
+#print("time post aneco: "+ str(post_aneco - post_peranto))
 
 konv_dissendo = TabelTransirDissendo()
-konv_dissendo.konverti(session_ueamsql)
+konv_dissendo.konverti(session_ueamsql, konv_asocionAuxUzanto)
 konv_dissendo.commit(session_novuea)
 
 post_dissendo= time.clock()
-print("time post dissendo: "+ str(post_dissendo - post_aneco))
+#print("time post dissendo: "+ str(post_dissendo - post_aneco))
+
+konv_dissendoDemanderoj = TabelTransirDissendoDemanderoj()
+konv_dissendoDemanderoj.konverti(session_ueamsql )
+konv_dissendoDemanderoj.commit(session_novuea)
+
+
+
+konv_dissendoRespondoj = TabelTransirDissendoRespondoj()
+konv_dissendoRespondoj.konverti(session_ueamsql, konv_asocion, konv_uzanton )
+konv_dissendoRespondoj.commit(session_novuea)
+
+
+
+konv_kongreso = TabelTransirKongreso()
+konv_kongreso.konverti(konv_urbon)
+konv_kongreso.commit(session_novuea)
+
+

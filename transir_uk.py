@@ -1,0 +1,130 @@
+# coding=utf8
+
+class TmpKongreso():
+
+    titolo = ""
+    urbo = ""
+    jaro = ""
+    numero = 0
+    temo = ""
+    aligxinto = 0
+
+    def __init__(self, titolo, urbo, jaro, numero, temo, aligxinto):
+        self.titolo = titolo
+        self.urbo = urbo
+        self.jaro = jaro
+        self.numero = numero
+        self.temo = temo
+        self.aligxinto = aligxinto
+
+
+
+def get_ukj():
+    ukj= {}
+    ukj['2020'] = TmpKongreso(titolo="105-a UK", urbo="Montrealo", jaro="2020", numero=105, temo="", aligxinto=0)
+    ukj['2019'] = TmpKongreso(titolo="104-a UK", jaro="2019", urbo= "Lahti", numero=104, temo="", aligxinto=0)
+    ukj['2018']= TmpKongreso(titolo="103-a UK ", jaro="2018", urbo="Lisbono", numero=103, temo="", aligxinto=0)
+    ukj['2017']= TmpKongreso(titolo="102-a UK ", jaro="2017", urbo="Seulo", numero=102, temo="Turismo kaj evoluo: vojoj al daŭripovo", aligxinto=1138)
+    ukj['2016']= TmpKongreso(titolo="101-a UK ", jaro="2016", urbo="Nitro", numero=101, temo="Socia justeco — lingva justeco", aligxinto=1253 )
+    ukj['2015']= TmpKongreso(titolo="100-a UK ", jaro="2015", urbo="Lillo", numero=100 , temo="Lingvoj, artoj kaj valoroj en la dialogo inter kulturoj ", aligxinto=2698)
+    ukj['2014']= TmpKongreso(titolo="99-a UK ", jaro="2014", urbo="Bonaero", numero=99 , temo="Ĉu la nepoj nin benos? Streboj al daŭripova estonteco", aligxinto=706)
+    ukj['2013']= TmpKongreso(titolo="98-a UK ", jaro="2013", urbo="Rejkjaviko", numero=98 , temo="Insuloj sen izoliĝo: por justa komunikado inter lingvo-komunumoj", aligxinto=1034)
+    ukj['2012']= TmpKongreso(titolo="97-a UK ", jaro="2012", urbo="Hanojo", numero=97 , temo="Esperanto - ponto al paco, amikeco kaj disvolviĝo", aligxinto=866)
+    ukj['2011']= TmpKongreso(titolo="96-a UK ", jaro="2011", urbo="Kopenhago", numero=96 , temo="Dialogo kaj interkompreno", aligxinto=1458)
+    ukj['2010']= TmpKongreso(titolo="95-a UK ", jaro="2010", urbo="Havano", numero=95 , temo="Interproksimigo de kulturoj", aligxinto=1002)
+    ukj['2009']= TmpKongreso(titolo="94-a UK ", jaro="2009", urbo="Bjalistoko", numero=94 , temo="Krei pacan ponton inter la popoloj: Zamenhof hodiaŭ", aligxinto=1860)
+    ukj['2008']= TmpKongreso(titolo="93-a UK ", jaro="2008", urbo="Roterdamo", numero=93 , temo="Lingvoj: trezoro de la homaro", aligxinto=1845)
+    ukj['2007']= TmpKongreso(titolo="92-a UK ", jaro="2007", urbo="Jokohamo", numero=92 , temo="Okcidento en Oriento: akcepto kaj rezisto", aligxinto=1901)
+    ukj['2006']= TmpKongreso(titolo="91-a UK ", jaro="2006", urbo="Florenco", numero=91 , temo="Lingvoj, kulturoj kaj edukado al daŭrigebla evoluigo", aligxinto=2209)
+    ukj['2005']= TmpKongreso(titolo="90-a UK ", jaro="2005", urbo="Vilno", numero=90 , temo="Universalaj Kongresoj: 100 jaroj de interkultura komunikado", aligxinto=2344)
+    ukj['2004']= TmpKongreso(titolo="89-a UK ", jaro="2004", urbo="Pekino", numero=89 , temo="Lingva egaleco en internaciaj rilatoj", aligxinto=2031)
+    ukj['2003']= TmpKongreso(titolo="88-a UK ", jaro="2003", urbo="Gotenburgo", numero=88 , temo="Lingvaj rajtoj kaj respondecoj", aligxinto=1792)
+    ukj['2002']= TmpKongreso(titolo="87-a UK ", jaro="2002", urbo="Fortalezo", numero=87 , temo="Diverseco: ŝanco, ne minaco", aligxinto=1484)
+    ukj['2001']= TmpKongreso(titolo="86-a UK ", jaro="2001", urbo="Zagrebo", numero=86 , temo="Kulturo de dialogo – dialogo inter kulturoj", aligxinto=1691)
+    ukj['2000']= TmpKongreso(titolo="85-a UK ", jaro="2000", urbo="Tel-Avivo", numero=85 , temo="Lingvo kaj kulturo de paco", aligxinto=1212)
+    ukj['1999']= TmpKongreso(titolo="84-a UK ", jaro="1999", urbo="Berlino", numero=84 , temo="Tutmondiĝo: ŝancoj por paco?", aligxinto=2712)
+    ukj['1998']= TmpKongreso(titolo="83-a UK ", jaro="1998", urbo="Montpeliero", numero=83 , temo="Mediteraneo - ponto inter kulturoj", aligxinto=3133)
+    ukj['1997']= TmpKongreso(titolo="82-a UK ", jaro="1997", urbo="Adelajdo", numero=82 , temo="Toleremo kaj justeco en multkultura socio", aligxinto=1224)
+    ukj['1996']= TmpKongreso(titolo="81-a UK ", jaro="1996", urbo="Prago", numero=81 , temo="Kulturo: valoro aŭ varo?", aligxinto=2972)
+    ukj['1995']= TmpKongreso(titolo="80-a UK ", jaro="1995", urbo="Tampereo", numero=80 , temo="Ni la popoloj – unu  mondo aŭ disaj eroj?", aligxinto=2443)
+    ukj['1994']= TmpKongreso(titolo="79-a UK ", jaro="1994", urbo="Seulo", numero=79 , temo="Azio en la mondo", aligxinto=1776)
+    ukj['1993']= TmpKongreso(titolo="78-a UK ", jaro="1993", urbo="Valencio", numero=78 , temo="Klerigo por la 21-a jarcento", aligxinto=1863)
+    ukj['1992']= TmpKongreso(titolo="77-a UK ", jaro="1992", urbo="Vieno", numero=77 , temo="Kiam falas muroj de miljaroj: komuna eŭropa domo", aligxinto=3033)
+    ukj['1991']= TmpKongreso(titolo="76-a UK ", jaro="1991", urbo="Bergeno", numero=76 , temo="Nordio - ĉu modelo?", aligxinto=2400)
+    ukj['1990']= TmpKongreso(titolo="75-a UK ", jaro="1990", urbo="Havano", numero=75 , temo="Esperanto, evoluo kaj kultura diverseco", aligxinto=1617)
+    ukj['1989']= TmpKongreso(titolo="74-a UK ", jaro="1989", urbo="Brajtono", numero=74 , temo="Lingvo kaj egaleco en internacia komunikado", aligxinto=2280)
+    ukj['1988']= TmpKongreso(titolo="73-a UK ", jaro="1988", urbo="Roterdamo", numero=73 , temo="Scienco kaj tekniko por internacia kompreniĝo", aligxinto=2321)
+    ukj['1987']= TmpKongreso(titolo="72-a UK ", jaro="1987", urbo="Varsovio", numero=72 , temo="Esperanto - 100 jaroj de internacia kulturo", aligxinto=5946)
+    ukj['1986']= TmpKongreso(titolo="71-a UK ", jaro="1986", urbo="Pekino", numero=71 , temo="Interkompreniĝo, paco, evoluo", aligxinto=2482)
+    ukj['1985']= TmpKongreso(titolo="70-a UK ", jaro="1985", urbo="Aŭgsburgo", numero=70 , temo="Antikvo kaj moderno: kion ŝanĝi, kion konservi?", aligxinto=2311)
+    ukj['1984']= TmpKongreso(titolo="69-a UK ", jaro="1984", urbo="Vankuvero", numero=69 , temo="Lingvaj minoritatoj - ĉu nur nacia fenomeno?", aligxinto=802)
+    ukj['1983']= TmpKongreso(titolo="68-a UK ", jaro="1983", urbo="Budapeŝto", numero=68 , temo="Sociaj kaj lingvaj aspektoj de la moderna komunikado", aligxinto=4834)
+    ukj['1982']= TmpKongreso(titolo="67-a UK ", jaro="1982", urbo="Antverpeno", numero=67 , temo="Generaciaj aspektoj de la Esperanto-movado", aligxinto=1899)
+    ukj['1981']= TmpKongreso(titolo="66-a UK ", jaro="1981", urbo="Braziljo", numero=66 , temo="Kulturoj kaj lingvoj: pontoj kaj baroj", aligxinto=1749)
+    ukj['1980']= TmpKongreso(titolo="65-a UK ", jaro="1980", urbo="Stokholmo", numero=65 , temo="Diskriminacio", aligxinto=1807)
+    ukj['1979']= TmpKongreso(titolo="64-a UK ", jaro="1979", urbo="Lucerno", numero=64 , temo="La lingva aspekto de internacia organiziĝo", aligxinto=1630)
+    ukj['1978']= TmpKongreso(titolo="63-a UK ", jaro="1978", urbo="Varno", numero=63 , temo="Internacia lingvo - internacia edukado", aligxinto=4414)
+    ukj['1977']= TmpKongreso(titolo="62-a UK ", jaro="1977", urbo="Rejkjaviko", numero=62 , temo="La rajto je komunikado", aligxinto=1199)
+    ukj['1976']= TmpKongreso(titolo="61-a UK ", jaro="1976", urbo="Ateno", numero=61 , temo="Internacia kunlaboro de ŝtatoj je regiona nivelo", aligxinto=1266)
+    ukj['1975']= TmpKongreso(titolo="60-a UK ", jaro="1975", urbo="Kopenhago", numero=60 , temo="La socia pozicio de la virino", aligxinto=1227)
+    ukj['1974']= TmpKongreso(titolo="59-a UK ", jaro="1974", urbo="Hamburgo", numero=59 , temo="Naciismo kaj internacia kunlaboro en nuntempa mondo", aligxinto=1651)
+    ukj['1973']= TmpKongreso(titolo="58-a UK ", jaro="1973", urbo="Beogrado", numero=58 , temo="Lingva egalrajteco en teorio kaj praktiko", aligxinto=1638)
+    ukj['1972']= TmpKongreso(titolo="57-a UK ", jaro="1972", urbo="Portlando", numero=57 , temo="Monda turismo kaj lingva diverseco", aligxinto=923)
+    ukj['1971']= TmpKongreso(titolo="56-a UK ", jaro="1971", urbo="Londono", numero=56 , temo="La problemo de lingva komunikado en nuntempa mondo", aligxinto=2071)
+    ukj['1970']= TmpKongreso(titolo="55-a UK ", jaro="1970", urbo="Vieno", numero=55 , temo="Esperanto kiel instrumento de internacia konceptado de la mondo", aligxinto=1987)
+    ukj['1969']= TmpKongreso(titolo="54-a UK ", jaro="1969", urbo="Helsinko", numero=54 , temo="", aligxinto=1857)
+    ukj['1968']= TmpKongreso(titolo="53-a UK ", jaro="1968", urbo="Madrido", numero=53 , temo="", aligxinto=1769)
+    ukj['1967']= TmpKongreso(titolo="52-a UK ", jaro="1967", urbo="Roterdamo", numero=52 , temo="", aligxinto=1265)
+    ukj['1966']= TmpKongreso(titolo="51-a UK ", jaro="1966", urbo="Budapeŝto", numero=51 , temo="", aligxinto=3975)
+    ukj['1965']= TmpKongreso(titolo="50-a UK ", jaro="1965", urbo="Tokio", numero=50 , temo="", aligxinto=1710)
+    ukj['1964']= TmpKongreso(titolo="49-a UK ", jaro="1964", urbo="Hago", numero=49 , temo="", aligxinto=2512)
+    ukj['1963']= TmpKongreso(titolo="48-a UK ", jaro="1963", urbo="Sofio", numero=48 , temo="", aligxinto=3472)
+    ukj['1962']= TmpKongreso(titolo="47-a UK ", jaro="1962", urbo="Kopenhago", numero=47 , temo="", aligxinto=1550)
+    ukj['1961']= TmpKongreso(titolo="46-a UK ", jaro="1961", urbo="Harogato", numero=46 , temo="", aligxinto=1646)
+    ukj['1960']= TmpKongreso(titolo="45-a UK ", jaro="1960", urbo="Bruselo", numero=45 , temo="", aligxinto=1930)
+    ukj['1959']= TmpKongreso(titolo="44-a UK ", jaro="1959", urbo="Varsovio", numero=44 , temo="", aligxinto=3256)
+    ukj['1958']= TmpKongreso(titolo="43-a UK ", jaro="1958", urbo="Majenco", numero=43 , temo="", aligxinto=2021)
+    ukj['1957']= TmpKongreso(titolo="42-a UK ", jaro="1957", urbo="Marsejlo", numero=42 , temo="", aligxinto=1468)
+    ukj['1956']= TmpKongreso(titolo="41-a UK ", jaro="1956", urbo="Kopenhago", numero=41 , temo="", aligxinto=2200)
+    ukj['1955']= TmpKongreso(titolo="40-a UK ", jaro="1955", urbo="Bolonio", numero=40 , temo="", aligxinto=1687)
+    ukj['1954']= TmpKongreso(titolo="39-a UK ", jaro="1954", urbo="Haarlemo", numero=39 , temo="", aligxinto=2353)
+    ukj['1953']= TmpKongreso(titolo="38-a UK ", jaro="1953", urbo="Zagrebo", numero=38 , temo="", aligxinto=1760)
+    ukj['1952']= TmpKongreso(titolo="37-a UK ", jaro="1952", urbo="Oslo", numero=37 , temo="", aligxinto=1614)
+    ukj['1951']= TmpKongreso(titolo="36-a UK ", jaro="1951", urbo="Munkeno", numero=36 , temo="", aligxinto=2040)
+    ukj['1950']= TmpKongreso(titolo="35-a UK ", jaro="1950", urbo="Parizo", numero=35 , temo="", aligxinto=2325)
+    ukj['1949']= TmpKongreso(titolo="34-a UK ", jaro="1949", urbo="Burnmuto", numero=34 , temo="", aligxinto=1534)
+    ukj['1948']= TmpKongreso(titolo="33-a UK ", jaro="1948", urbo="Malmö", numero=33 , temo="", aligxinto=1761)
+    ukj['1947']= TmpKongreso(titolo="32-a UK ", jaro="1947", urbo="Berno", numero=32 , temo="", aligxinto=1370)
+    ukj['1939']= TmpKongreso(titolo="31-a UK ", jaro="1939", urbo="Berno", numero=31 , temo="", aligxinto=765)
+    ukj['1938']= TmpKongreso(titolo="30-a UK ", jaro="1938", urbo="Londono", numero=30 , temo="", aligxinto=1602)
+    ukj['1937']= TmpKongreso(titolo="29-a UK ", jaro="1937", urbo="Varsovio", numero=29 , temo="", aligxinto=1120)
+    ukj['1936']= TmpKongreso(titolo="28-a UK ", jaro="1936", urbo="Vieno", numero=28 , temo="", aligxinto=854)
+    ukj['1935']= TmpKongreso(titolo="27-a UK ", jaro="1935", urbo="Romo", numero=27 , temo="", aligxinto=1442)
+    ukj['1934']= TmpKongreso(titolo="26-a UK ", jaro="1934", urbo="Stokholmo", numero=26 , temo="", aligxinto=2042)
+    ukj['1933']= TmpKongreso(titolo="25-a UK ", jaro="1933", urbo="Kolonjo", numero=25 , temo="", aligxinto=950)
+    ukj['1932']= TmpKongreso(titolo="24-a UK ", jaro="1932", urbo="Parizo", numero=24 , temo="", aligxinto=1650)
+    ukj['1931']= TmpKongreso(titolo="23-a UK ", jaro="1931", urbo="Krakovo", numero=23 , temo="", aligxinto=900)
+    ukj['1930']= TmpKongreso(titolo="22-a UK ", jaro="1930", urbo="Oksfordo", numero=22 , temo="", aligxinto=1211)
+    ukj['1929']= TmpKongreso(titolo="21-a UK ", jaro="1929", urbo="Budapeŝto", numero=21 , temo="", aligxinto=1200)
+    ukj['1928']= TmpKongreso(titolo="20-a UK ", jaro="1928", urbo="Antverpeno", numero=20 , temo="", aligxinto=1494)
+    ukj['1927']= TmpKongreso(titolo="19-a UK ", jaro="1927", urbo="Dancigo", numero=19 , temo="", aligxinto=905)
+    ukj['1926']= TmpKongreso(titolo="18-a UK ", jaro="1926", urbo="Edinburgo", numero=18 , temo="", aligxinto=960)
+    ukj['1925']= TmpKongreso(titolo="17-a UK ", jaro="1925", urbo="Ĝenevo", numero=17 , temo="", aligxinto=953)
+    ukj['1924']= TmpKongreso(titolo="16-a UK ", jaro="1924", urbo="Vieno", numero=16 , temo="", aligxinto=3054)
+    ukj['1923']= TmpKongreso(titolo="15-a UK ", jaro="1923", urbo="Nurnbergo", numero=15 , temo="", aligxinto=4963)
+    ukj['1922']= TmpKongreso(titolo="14-a UK ", jaro="1922", urbo="Helsinko", numero=14 , temo="", aligxinto=850)
+    ukj['1921']= TmpKongreso(titolo="13-a UK ", jaro="1921", urbo="Prago", numero=13 , temo="", aligxinto=2561)
+    ukj['1920']= TmpKongreso(titolo="12-a UK ", jaro="1920", urbo="Hago", numero=12 , temo="", aligxinto=408)
+    ukj['1915']= TmpKongreso(titolo="11-a UK ", jaro="1915", urbo="Sanfrancisko", numero=11 , temo="", aligxinto=163)
+    ukj['1914']= TmpKongreso(titolo="10-a UK ", jaro="1914", urbo="Parizo", numero=10 , temo="", aligxinto=3739)
+    ukj['1913 ']= TmpKongreso(titolo="9-a UK ", jaro="1913 ", urbo="Berno", numero=9 , temo="", aligxinto=1203)
+    ukj['1912 ']= TmpKongreso(titolo="8-a UK ", jaro="1912 ", urbo="Krakovo", numero=8 , temo="", aligxinto=1000)
+    ukj['1911 ']= TmpKongreso(titolo="7-a UK ", jaro="1911 ", urbo="Antverpeno", numero=7 , temo="", aligxinto=1800)
+    ukj['1910 ']= TmpKongreso(titolo="6-a UK ", jaro="1910 ", urbo="Vaŝingtono", numero=6 , temo="", aligxinto=357)
+    ukj['1909 ']= TmpKongreso(titolo="5-a UK ", jaro="1909 ", urbo="Barcelono", numero=5 , temo="", aligxinto=1500)
+    ukj['1908 ']= TmpKongreso(titolo="4-a UK ", jaro="1908 ", urbo="Dresdeno", numero=4 , temo="", aligxinto=1500)
+    ukj['1907 ']= TmpKongreso(titolo="3-a UK ", jaro="1907 ", urbo="Kembriĝo", numero=3 , temo="", aligxinto=1317)
+    ukj['1906 ']= TmpKongreso(titolo="2-a UK ", jaro="1906 ", urbo="Ĝenevo", numero=2 , temo="", aligxinto=1200)
+    ukj['1905 ']= TmpKongreso(titolo="1-a UK ", jaro="1905 ", urbo="Bulonjo-ĉe-Maro", numero=1 , temo="", aligxinto=688)
+    return ukj
+

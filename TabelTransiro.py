@@ -1,3 +1,11 @@
+def db_encode(vorto):
+    if vorto is None:
+        return ""
+    else :
+        return vorto.encode('utf-8')
+
+
+
 class TabelTransiro:
 
 
@@ -29,13 +37,14 @@ class TabelTransiro:
         session_novuea.commit()
 
     def add(self, sxlosilo, ento):
-        self.tabelaro[str(sxlosilo)] = ento
+        self.tabelaro[sxlosilo] = ento
     
     def trovi(self, sxlosilo):
         try:
-            return self.tabelaro[str(sxlosilo)]
+            return self.tabelaro[sxlosilo]
         except : 
             return None
 
     def ene(self, sxlosilo):
-        return str(sxlosilo) in self.tabelaro
+        return sxlosilo in self.tabelaro
+

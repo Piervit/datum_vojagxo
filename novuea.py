@@ -246,6 +246,13 @@ class KongresaEkskurso(Base):
     kvanto = Column(Integer)
 
 
+class KongresaKategorio(Base):
+    __tablename__ = 'kongresa_kategorio'
+
+    id = Column(Integer, primary_key=True)
+    nomo = Column(String(255, 'utf8_bin'))
+
+
 class KongresaLogxejo(Base):
     __tablename__ = 'kongresa_logxejo'
 
@@ -418,6 +425,7 @@ class RefDissendoRespondoj(Base):
     __tablename__ = 'ref_dissendo_respondoj'
 
     idUzantoAuxAsocio = Column(Integer, primary_key=True, nullable=False)
+    retadreso = Column(String(255, 'utf8_bin'), primary_key=True, nullable=False)
     idDissendoDemandero = Column(Integer, primary_key=True, nullable=False)
 
 
@@ -433,6 +441,13 @@ class RefKongresaEkskursoMendo(Base):
 
     idKAligxinto = Column(Integer, primary_key=True, nullable=False)
     idKEkskurso = Column(Integer, primary_key=True, nullable=False)
+
+
+class RefKongresaKategorioKongreso(Base):
+    __tablename__ = 'ref_kongresa_kategorio_kongreso'
+
+    idKongresaKategorio = Column(Integer, primary_key=True, nullable=False)
+    idKongreso = Column(Integer, primary_key=True, nullable=False)
 
 
 t_ref_kongresa_servo_aligxinto = Table(
